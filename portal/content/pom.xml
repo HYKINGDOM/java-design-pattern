@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <parent>
+        <artifactId>portal</artifactId>
+        <groupId>org.fkjava</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+    <modelVersion>4.0.0</modelVersion>
+
+    <artifactId>content</artifactId>
+
+    <dependencies>
+        <dependency>
+            <groupId>org.fkjava</groupId>
+            <artifactId>commons</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- 把服务注册到注册中心 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+        </dependency>
+        <!-- 从配置中心获取配置信息 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-config</artifactId>
+        </dependency>
+        <!-- Spring Web MVC，支持RESTful风格的WEB服务开发 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <!--通过Spring Data JPA操作数据库-->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+        </dependency>
+        <!--数据库驱动-->
+        <dependency>
+            <groupId>mysql</groupId>
+            <artifactId>mysql-connector-java</artifactId>
+            <scope>runtime</scope>
+        </dependency>
+        <!-- 调用远程服务 -->
+        <dependency>
+            <groupId>org.springframework.cloud</groupId>
+            <artifactId>spring-cloud-starter-openfeign</artifactId>
+        </dependency>
+        <!-- 结合openfeign用于调用用户中心的服务 -->
+        <dependency>
+            <groupId>org.fkjava</groupId>
+            <artifactId>user-center-api</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        <!-- 登录、授权 -->
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>resource-auth</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+    </dependencies>
+
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <fork>true</fork>
+                    <!-- 端口号要改 -->
+                    <jmxPort>30010</jmxPort>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
+</project>

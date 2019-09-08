@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<configuration>
+    <!-- 设置日志文件的名称和路径，避免一个服务器里面有多个Spring Boot应用，把日志文件覆盖的问题 -->
+    <!-- <property name="LOG_FILE" value="/tmp/logs/tenant.log" /> -->
+    <include
+            resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger level="error" name="org.fkjava.gateway.config.SecurityConfig"></logger>
+    <logger level="trace" name="org.fkjava"></logger>
+    <logger level="error" name="sun.rmi"/>
+    <logger level="error" name="javax.management"/>
+    <logger level="error" name="org.springframework.cloud.config.client"/>
+    <logger level="error" name="sun.net"/>
+    <logger level="error" name="org.springframework.core.env"/>
+    <logger level="error" name="org.springframework.beans"/>
+    <logger level="error" name="java.io"/>
+    <logger level="error" name="org.springframework.util"/>
+    <logger level="error" name="io.netty"/>
+    <logger level="error" name="org.springframework.boot.context.config"/>
+    <root level="error">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+</configuration>
