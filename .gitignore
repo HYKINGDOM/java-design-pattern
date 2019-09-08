@@ -15,16 +15,19 @@ logs
 *.tgz
 hs_err_pid*
 
-/workspace.xml
-/compiler.xml
-/encodings.xml
-/misc.xml
-/modules.xml
-/uiDesigner.xml
-/vcs.xml
+/*/workspace.xml
+/*/compiler.xml
+/*/encodings.xml
+/*/misc.xml
+/*/modules.xml
+/*/uiDesigner.xml
+/*/vcs.xml
 /.idea/
+/*/.idea/
 *.iml
 /*/target/
+
+*.workspace
 
 # Node.js
 pids
