@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>org.fkjava</groupId>
+    <artifactId>portal</artifactId>
+    <version>1.0-SNAPSHOT</version>
+    <modules>
+        <module>registry-center</module>
+        <module>user-center</module>
+        <module>api-gateway</module>
+        <module>oauth-server</module>
+        <module>config-center</module>
+        <module>storage</module>
+        <module>commons</module>
+        <module>resource-auth</module>
+        <module>user-center-api</module>
+        <module>verify-code</module>
+        <module>verify-code-api</module>
+        <module>test</module>
+        <module>monitor</module>
+        <module>user-center-domain</module>
+        <module>we-chat</module>
+        <module>content</module>
+    </modules>
+    <packaging>pom</packaging>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>2.1.6.RELEASE</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <properties>
+        <java.version>11</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring-cloud.version>Greenwich.SR2</spring-cloud.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- 当scope为import的时候，相当于把GAV对应的pom内容导入到当前pom里面 -->
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-dependencies</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+</project>

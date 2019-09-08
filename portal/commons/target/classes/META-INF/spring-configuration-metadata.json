@@ -1,0 +1,53 @@
+{
+  "groups": [
+    {
+      "name": "fk",
+      "type": "org.fkjava.commons.config.CommonConfigProperties",
+      "sourceType": "org.fkjava.commons.config.CommonConfigProperties"
+    },
+    {
+      "name": "fk.we-chat-login",
+      "type": "org.fkjava.commons.config.CommonConfigProperties$WeChatLogin",
+      "sourceType": "org.fkjava.commons.config.CommonConfigProperties"
+    }
+  ],
+  "properties": [
+    {
+      "name": "fk.all-we-chats",
+      "type": "java.util.Collection<org.fkjava.commons.config.CommonConfigProperties$WeChat>",
+      "sourceType": "org.fkjava.commons.config.CommonConfigProperties"
+    },
+    {
+      "name": "fk.api-path",
+      "type": "java.lang.String",
+      "description": "默认值是一个空字符串",
+      "sourceType": "org.fkjava.commons.config.CommonConfigProperties",
+      "defaultValue": ""
+    },
+    {
+      "name": "fk.api-prefix",
+      "type": "java.lang.String",
+      "description": "默认值是 hostPrefix + apiPath",
+      "sourceType": "org.fkjava.commons.config.CommonConfigProperties"
+    },
+    {
+      "name": "fk.host-prefix",
+      "type": "java.lang.String",
+      "description": "默认值 http:\/\/localhost:20001",
+      "sourceType": "org.fkjava.commons.config.CommonConfigProperties",
+      "defaultValue": "http:\/\/localhost:20001"
+    },
+    {
+      "name": "fk.we-chat-function",
+      "type": "java.util.function.Function<java.util.Map$Entry<java.lang.String,org.fkjava.commons.config.CommonConfigProperties$WeChat>,org.fkjava.commons.config.CommonConfigProperties$WeChat>",
+      "sourceType": "org.fkjava.commons.config.CommonConfigProperties"
+    },
+    {
+      "name": "fk.we-chats",
+      "type": "java.util.Map<java.lang.String,org.fkjava.commons.config.CommonConfigProperties$WeChat>",
+      "description": "以公众号的微信号为key存储",
+      "sourceType": "org.fkjava.commons.config.CommonConfigProperties"
+    }
+  ],
+  "hints": []
+}

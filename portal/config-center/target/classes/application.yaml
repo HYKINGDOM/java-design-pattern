@@ -1,0 +1,27 @@
+server:
+  port: 20002
+eureka:
+  client:
+    # 把自己也注册为一个服务
+    registerWithEureka: true
+    # 抓取远程的注册表信息
+    fetchRegistry: true
+    serviceUrl:
+      # 分区中有多少个主机
+      defaultZone: http://127.0.0.1:8761/eureka
+  instance:
+    prefer-ip-address: true
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        # 使用本地文件
+        native:
+          # 本地文件的路径，多个路径使用逗号隔开
+          search-locations: classpath:/shared/
+  profiles:
+    # 激活使用本地文件
+    active: native
+
