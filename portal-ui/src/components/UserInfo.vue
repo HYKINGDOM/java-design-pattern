@@ -1,7 +1,7 @@
 <template>
   <div class="text-right user-info">
     <router-link to="/user/profile">{{name}}</router-link>
-    <a v-if="User" @click="logout">退出登录</a>
+    <a v-if="User.name" @click="logout">退出登录</a>
   </div>
 </template>
 
