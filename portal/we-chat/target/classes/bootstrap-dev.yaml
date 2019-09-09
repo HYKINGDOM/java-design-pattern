@@ -1,7 +1,0 @@
-spring:
-  application:
-    name: we-chat
-  cloud:
-    config:
-      uri: http://127.0.0.1:20002
-      fail-fast: true
