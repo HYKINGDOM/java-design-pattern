@@ -6,12 +6,20 @@ import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Getter
 @Setter
+@Table(
+        indexes = {
+                @Index(name = "search_table", columnList = "enable, account"),
+                @Index(name = "search_table_order", columnList = "enable, account, nickName")
+        }
+)
 public class UserInfo {
 
     @Id
@@ -124,6 +132,17 @@ public class UserInfo {
     private Date subscribeDate;
     // 默认为true，取消关注以后为false
     private boolean enable = true;
+    @Transient
+    private List<Tag> tags;
+
+    @Transient
+    public List<String> getTagNames() {
+        if (tags != null) {
+            return tags.stream().map(Tag::getName).collect(Collectors.toList());
+        } else {
+            return Collections.emptyList();
+        }
+    }
 
 //    @Transient
 //    public Date getSubscribeDate() {

@@ -74,7 +74,7 @@ export default {
       transferOptions: {
         ltHeadText: "未选择",
         rtHeadText: "已选择",
-        filterable: true,
+        filterable: false,
         placeholder: "关键字搜索"
         // ,
         // // 负责如何显示文本内容
@@ -126,7 +126,7 @@ export default {
         });
     },
     loadUsers(account) {
-      let url = "/api/we-chat/user/" + account;
+      let url = "/api/we-chat/user/names/" + account;
       axios
         .get(url)
         .then(response => {

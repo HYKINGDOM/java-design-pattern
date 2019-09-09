@@ -12,7 +12,6 @@ import org.fkjava.wechat.repository.jpa.UserInfoRepository;
 import org.fkjava.wechat.repository.redis.AccessTokenRepository;
 import org.fkjava.wechat.service.RedisLock;
 import org.fkjava.wechat.service.WeiXinService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.*;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.redis.core.StringRedisTemplate;
@@ -29,16 +28,11 @@ import java.util.stream.Collectors;
 @Slf4j
 public class WeiXinServiceHttpClientImpl implements WeiXinService {
 
-    @Autowired
-    private TagRepository tagRepository;
-    @Autowired
-    private UserInfoRepository userInfoRepository;
-    @Autowired
-    private CommonConfigProperties commonConfigProperties;
-    @Autowired
-    private AccessTokenRepository accessTokenRepository;
-    @Autowired
-    private StringRedisTemplate stringRedisTemplate;
+    private final TagRepository tagRepository;
+    private final UserInfoRepository userInfoRepository;
+    private final CommonConfigProperties commonConfigProperties;
+    private final AccessTokenRepository accessTokenRepository;
+    private final StringRedisTemplate stringRedisTemplate;
 
     // 当程序是多线程的，并且Map作为成员变量提供使用的时候，最好使用ConcurrentHashMap
     // ConcurrentHashMap支持多线程、并发。
@@ -46,9 +40,20 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
     // 两个其实都是线程不安全的，但是ConcurrentHashMap里面使用【乐观锁】的方式保证数据的安全。
     // 每当修改ConcurrentHashMap里面数据的时候，先检查是否被其他人修改过，如果修改过则重试。
 //    private final Map<String, AccessToken> tokenMap = new ConcurrentHashMap<>();
-    private CommonConfigProperties properties;
+    private final CommonConfigProperties properties;
 
-    public WeiXinServiceHttpClientImpl(CommonConfigProperties properties) {
+    public WeiXinServiceHttpClientImpl(
+            TagRepository tagRepository,
+            UserInfoRepository userInfoRepository,
+            CommonConfigProperties commonConfigProperties,
+            AccessTokenRepository accessTokenRepository,
+            StringRedisTemplate stringRedisTemplate,
+            CommonConfigProperties properties) {
+        this.tagRepository = tagRepository;
+        this.userInfoRepository = userInfoRepository;
+        this.commonConfigProperties = commonConfigProperties;
+        this.accessTokenRepository = accessTokenRepository;
+        this.stringRedisTemplate = stringRedisTemplate;
         this.properties = properties;
     }
 
@@ -157,19 +162,32 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
             List<UserInfo> userInfos = tag.getUserInfos();
             // 用于传递给页面上的标签跟用户的关闭
             List<String> users = tag.getUsers();
-            userInfos.forEach(u -> {
-                users.add(u.getId());
-            });
+            userInfos.forEach(u -> users.add(u.getId()));
         });
 
         return page;
     }
 
     @Override
-    public Page<UserInfo> findUsers(String account, int pageNumber, String keyword) {
+    public Page<UserInfo> findUserNames(String account, int pageNumber, int pageSize, String keyword) {
+        Page<UserInfo> page = this.findUsers(account, pageNumber, pageSize, keyword);
+        List<UserInfo> users = page.getContent().stream()
+                .map(user1 -> {
+                    UserInfo user2 = new UserInfo();
+                    user2.setId(user1.getId());
+                    user2.setNickName(user1.getNickName());
+                    return user2;
+                })
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(users, page.getPageable(), page.getTotalElements());
+    }
+
+    @Override
+    public Page<UserInfo> findUsers(String account, int pageNumber, int pageSize, String keyword) {
         // 查询所有的非临时标签，如果有关键字则根据关键字搜索（名称）
         Sort sort = Sort.by(Sort.Order.asc("nickName"));//排序条件
-        Pageable pageable = PageRequest.of(pageNumber, 1000, sort);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         Specification<UserInfo> spec = (root, query, builder) -> {
             // 只查询temporary为true的 标签
@@ -183,17 +201,15 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
         };
 
         Page<UserInfo> page = this.userInfoRepository.findAll(spec, pageable);
-        List<UserInfo> users = page.getContent().stream()
-                .map(user1 -> {
-                    UserInfo user2 = new UserInfo();
-                    user2.setId(user1.getId());
-                    user2.setNickName(user1.getNickName());
-                    return user2;
-                })
-                .collect(Collectors.toList());
 
-        Page<UserInfo> newPage = new PageImpl<>(users, pageable, page.getTotalElements());
-        return newPage;
+        // 读取用户的标签名称
+        page.getContent().forEach(userInfo -> {
+            List<Integer> tagIdList = userInfo.getTagIdList();
+            List<Tag> tags = this.tagRepository.findByAccountAndWeChatTagIdIn(account, tagIdList);
+            userInfo.setTags(tags);
+        });
+
+        return page;
     }
 
     @Override
@@ -203,12 +219,11 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
         // 1.把标签对应的用户关联起来（把users里面的id转换为UserInfo对象放入userInfos集合里面）
         tag.setUserInfos(new LinkedList<>());
         tag.getUsers().forEach(userInfoId -> {
-            UserInfo ui = this.userInfoRepository.findById(userInfoId).get();
-            tag.getUserInfos().add(ui);
+            Optional<UserInfo> optionalUserInfo = this.userInfoRepository.findById(userInfoId);
+            optionalUserInfo.ifPresent(userInfo -> tag.getUserInfos().add(userInfo));
         });
         // 2.把标签保存到数据库
         tag.setTemporary(false);//自己添加的标签，就不是临时标签
-        Tag savedTag = this.tagRepository.save(tag);
         // 3.把标签发送给微信公众号平台，保存以后会返回一个数字的id（Tag对象），需要更新本地数据库的Tag对象
 
         // 标签在页面上选择了某个公众号以后，本身就携带了公众号的微信账号，通过微信账号来查找配置参数。
@@ -219,39 +234,82 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
                 .orElseThrow(() -> new RuntimeException("公众号配置错误：根据微信账号 [" + tag.getAccount() + "] 未找到公众号"));
 
         AccessToken token = this.getAccessToken(weChat.getAccount());
-        String uri = "/tags/create";
         Map<String, String> params = new HashMap<>();
         params.put("access_token", token.getToken());
 
-        // 提交给公众号的数据不确定，所以直接发送Map对象
-        Map<String, Map<String, Object>> data = new HashMap();
-
-        Map<String, Object> tagMap = new HashMap<>();
-        tagMap.put("name", tag.getName());
-        data.put("tag", tagMap);
-
-        Map<String, ?> result = HttpClientProxy.post(uri, params, data);
-
-        Map<?, ?> resultTagMap = (Map<?, ?>) result.get("tag");
-        if (resultTagMap == null) {
-            // 出现错误的情况下就没有名为tag的属性返回
-            throw new RuntimeException("保存标签出现问题: " + result.toString());
-        }
-        // 把id更新到本地数据库
-        Integer id = (Integer) resultTagMap.get("id");
-        tag.setId(id);
-//        this.tagRepository.save(tag);
+        Integer id = createOrUpdateTag(params, tag);
+        this.tagRepository.save(tag);
 
         // 把用户批量添加到标签里面
         List<String> openIds = new LinkedList<>();
-        tag.getUserInfos().forEach(userInfo -> {
-            openIds.add(userInfo.getOpenId());
-        });
+        tag.getUserInfos().forEach(userInfo -> openIds.add(userInfo.getOpenId()));
         Map<String, Object> addUsersMap = new HashMap<>();
         addUsersMap.put("openid_list", openIds);
         addUsersMap.put("tagid", id);
         HttpClientProxy.post("/tags/members/batchtagging", params, addUsersMap);
 
+        // 把标签的ID跟用户信息关联起来
+        tag.getUserInfos().forEach(userInfo -> {
+            if (userInfo.getTagIdList() == null) {
+                userInfo.setTagIdList(new LinkedList<>());
+            }
+            userInfo.getTagIdList().stream()
+                    .filter(tagId -> tagId.equals(tag.getWeChatTagId()))
+                    .findFirst()
+                    .ifPresentOrElse(tagId -> {
+                    }, () -> userInfo.getTagIdList().add((tag.getWeChatTagId())));
+        });
+
         return Result.ok("标签保存成功");
+    }
+
+    private Integer createOrUpdateTag(Map<String, String> params, Tag tag) {
+
+        // 如果有id，检查是否修改了标签的名称，硒鼓名称以后才需要同步到微信公众号，否则会报错
+        if (tag.getTagId() != null) {
+            Tag old = this.tagRepository.getOne(tag.getTagId());
+            if (old.getName().equals(tag.getName())) {
+                log.trace("不需要同步标签到公众号平台，直接使用已有的标签ID");
+                return old.getWeChatTagId();
+            }
+        }
+
+        String uri = "/tags/create";
+        // 提交给公众号的数据不确定，所以直接发送Map对象
+        Map<String, Map<String, Object>> data = new HashMap<>();
+
+        Map<String, Object> tagMap = new LinkedHashMap<>();
+        if (tag.getWeChatTagId() != null) {
+            log.trace("修改已有的标签，标签ID为: {}", tag.getWeChatTagId());
+            // 有微信的标签ID，则修改记录
+            uri = "/tags/update";
+            tagMap.put("id", tag.getWeChatTagId());
+        } else {
+            log.trace("新增标签，标签名称为: {}", tag.getName());
+        }
+        tagMap.put("name", tag.getName());
+        data.put("tag", tagMap);
+
+        Map<String, ?> result = HttpClientProxy.post(uri, params, data);
+        Integer id;
+        if (tag.getWeChatTagId() != null) {
+            Map<?, ?> resultTagMap = (Map<?, ?>) result.get("tag");
+            if (resultTagMap == null) {
+                // 出现错误的情况下就没有名为tag的属性返回
+                throw new RuntimeException("保存标签出现问题: " + result.toString());
+            }
+            // 把id更新到本地数据库
+            id = (Integer) resultTagMap.get("id");
+            tag.setWeChatTagId(id);
+        } else {
+            // 修改的时候，返回errcode为0，表示修改成功
+            Integer errorCode = (Integer) result.get("errcode");
+            if (errorCode != null && errorCode == 0) {
+                id = tag.getWeChatTagId();
+            } else {
+                throw new RuntimeException("保存标签出现问题: " + result.toString());
+            }
+        }
+        return id;
     }
 }

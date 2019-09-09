@@ -33,7 +33,9 @@ public interface WeiXinService {
 
     Page<Tag> findTags(String account, int pageNumber, String keyword);
 
-    Page<UserInfo> findUsers(String account, int pageNumber, String keyword);
+    Page<UserInfo> findUsers(String account, int pageNumber, int pageSize, String keyword);
 
     Result saveTag(Tag tag);
+
+    Page<UserInfo> findUserNames(String account, int pageNumber, int pageSize, String keyword);
 }

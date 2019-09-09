@@ -13,12 +13,23 @@ public class UserInfoController {
     @Autowired
     private WeiXinService weiXinService;
 
-    @GetMapping("{account}")
-    public Page<UserInfo> allTags(
+    @GetMapping("/names/{account}")
+    public Page<UserInfo> allUserNames(
             @PathVariable("account") String account,
-            @RequestParam(name = "pageNumber", defaultValue = "0") int pageNumber,
-            @RequestParam(name = "keyword", required = false) String keyword
+            @RequestParam(name = "pn", defaultValue = "0") int pageNumber,
+            @RequestParam(name = "ps", defaultValue = "1000") int pageSize,
+            @RequestParam(name = "kw", required = false) String keyword
     ) {
-        return this.weiXinService.findUsers(account, pageNumber, keyword);
+        return this.weiXinService.findUserNames(account, pageNumber, pageSize, keyword);
+    }
+
+    @GetMapping("{account}")
+    public Page<UserInfo> allUsers(
+            @PathVariable("account") String account,
+            @RequestParam(name = "pn", defaultValue = "0") int pageNumber,
+            @RequestParam(name = "ps", defaultValue = "10") int pageSize,
+            @RequestParam(name = "kw", required = false) String keyword
+    ) {
+        return this.weiXinService.findUsers(account, pageNumber, pageSize, keyword);
     }
 }
