@@ -21,7 +21,7 @@
                 maxlength="30"
                 placeholder="备注信息，最长30个字符"
               />
-              <Button color="primary">修改</Button>
+              <Button color="primary" @click="updateRemark">修改</Button>
             </div>
           </FormItem>
         </Form>
@@ -266,6 +266,19 @@ export default {
           this.$Message({ type: "success", text: "修改密码成功" });
           this.getUser(this.user.id);
         });
+    },
+    updateRemark() {
+      let data = new FormData();
+      data.append("id", this.userInfo.id);
+      data.append("remark", this.userInfo.remark);
+      axios.post("/api/we-chat/user/update-remark", data).then(response => {
+        let result = response.data;
+        if (result.code === 1) {
+          this.$Message({ type: "success", text: result.message });
+        } else {
+          this.$Message({ type: "error", text: result.message });
+        }
+      });
     }
   }
 };

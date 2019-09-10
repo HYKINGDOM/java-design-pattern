@@ -227,15 +227,7 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
         // 3.把标签发送给微信公众号平台，保存以后会返回一个数字的id（Tag对象），需要更新本地数据库的Tag对象
 
         // 标签在页面上选择了某个公众号以后，本身就携带了公众号的微信账号，通过微信账号来查找配置参数。
-        CommonConfigProperties.WeChat weChat = commonConfigProperties.getAllWeChats()
-                .stream()
-                .filter(wc -> wc.getAccount().equals(tag.getAccount()))
-                .findFirst()
-                .orElseThrow(() -> new RuntimeException("公众号配置错误：根据微信账号 [" + tag.getAccount() + "] 未找到公众号"));
-
-        AccessToken token = this.getAccessToken(weChat.getAccount());
-        Map<String, String> params = new HashMap<>();
-        params.put("access_token", token.getToken());
+        Map<String, String> params = this.createParams(tag.getAccount());
 
         Integer id = createOrUpdateTag(params, tag);
         this.tagRepository.save(tag);
@@ -323,5 +315,41 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
         List<Tag> tags = this.tagRepository.findByAccountAndWeChatTagIdIn(userInfo.getAccount(), tagIdList);
         userInfo.setTags(tags);
         return userInfo;
+    }
+
+    @Override
+    @Transactional
+    public Result updateRemark(String id, String remark) {
+        Optional<UserInfo> userInfo = this.userInfoRepository.findById(id);
+        userInfo.ifPresent(ui -> {
+            ui.setRemark(remark);
+            // 同步备注信息到微信公众号
+            Map<String, String> params = this.createParams(ui.getAccount());
+            Map<String, Object> data = new LinkedHashMap<>();
+            data.put("openid", ui.getOpenId());
+            data.put("remark", remark);
+
+            Map<String, ?> result = HttpClientProxy.post("/user/info/updateremark", params, data);
+            if (!result.get("errcode").toString().equals("0")) {
+                throw new RuntimeException("无法把用户备注发送给微信公众号平台: " + result.get("errmsg"));
+            }
+        });
+        return Result.ok("用户备注名称修改成功");
+    }
+
+    private CommonConfigProperties.WeChat getConfig(String account) {
+        return commonConfigProperties.getAllWeChats()
+                .stream()
+                .filter(wc -> wc.getAccount().equals(account))
+                .findFirst()
+                .orElseThrow(() -> new RuntimeException("公众号配置错误：根据微信账号 [" + account + "] 未找到公众号"));
+    }
+
+    private Map<String, String> createParams(String account) {
+        CommonConfigProperties.WeChat weChat = this.getConfig(account);
+        AccessToken token = this.getAccessToken(weChat.getAccount());
+        Map<String, String> params = new HashMap<>();
+        params.put("access_token", token.getToken());
+        return params;
     }
 }

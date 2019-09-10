@@ -1,8 +1,8 @@
 package org.fkjava.wechat.controller;
 
+import org.fkjava.commons.domain.Result;
 import org.fkjava.wechat.domain.UserInfo;
 import org.fkjava.wechat.service.WeiXinService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,8 +10,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/user")
 public class UserInfoController {
 
-    @Autowired
-    private WeiXinService weiXinService;
+    private final WeiXinService weiXinService;
+
+    public UserInfoController(WeiXinService weiXinService) {
+        this.weiXinService = weiXinService;
+    }
 
     @GetMapping("/names/{account}")
     public Page<UserInfo> allUserNames(
@@ -32,9 +35,15 @@ public class UserInfoController {
     ) {
         return this.weiXinService.findUsers(account, pageNumber, pageSize, keyword);
     }
+
     @GetMapping("{openId}")
     public UserInfo findUserByOpenId(
             @PathVariable String openId) {
         return this.weiXinService.findUserById(openId);
+    }
+
+    @PostMapping("update-remark")
+    public Result updateRemark(String id, String remark) {
+       return this.weiXinService.updateRemark(id, remark);
     }
 }

@@ -40,4 +40,6 @@ public interface WeiXinService {
     Page<UserInfo> findUserNames(String account, int pageNumber, int pageSize, String keyword);
 
     UserInfo findUserById(String openId);
+
+    Result updateRemark(String id, String remark);
 }
