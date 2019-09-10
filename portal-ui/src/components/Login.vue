@@ -71,9 +71,8 @@ export default {
             headers: { accept: "text/html", XMLHttpRequest: "axios" }
           })
           .then(result => {
-            console.log(result);
             this.isLoading = false;
-            this.$router.push("/");
+            this.$router.replace("/");
           })
           .catch(e => {
             this.isLoading = false;

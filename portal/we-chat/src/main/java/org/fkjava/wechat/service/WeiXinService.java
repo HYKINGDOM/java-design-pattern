@@ -7,6 +7,8 @@ import org.fkjava.wechat.domain.UserInfo;
 import org.fkjava.wechat.message.send.OutMessage;
 import org.springframework.data.domain.Page;
 
+import java.util.List;
+
 public interface WeiXinService {
 
     /**
@@ -31,9 +33,19 @@ public interface WeiXinService {
 
     void send(OutMessage message);
 
-    Page<Tag> findTags(String account, int pageNumber, String keyword);
+    Page<Tag> findTags(String account, int pageNumber, int pageSize, String keyword);
 
-    Page<UserInfo> findUsers(String account, int pageNumber, String keyword);
+    Page<UserInfo> findUsers(String account, int pageNumber, int pageSize, String keyword);
 
     Result saveTag(Tag tag);
+
+    Page<UserInfo> findUserNames(String account, int pageNumber, int pageSize, String keyword);
+
+    UserInfo findUserById(String openId);
+
+    Result updateRemark(String id, String remark);
+
+    Result updateTags(String id, String[] tagId);
+
+    List<Tag> findTagsByUserId(String id);
 }

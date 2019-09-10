@@ -5,7 +5,34 @@
         <Select v-model="selectedAccount" :datas="accounts" :deletable="false" type="object"></Select>
       </FormItem>
     </Form>
-    
+    <Table :datas="page.content" :stripe="true" :loading="loading">
+      <TableItem title="昵称">
+        <template slot-scope="{data}">
+          <img style="width: 50px;" :src="data.headimgurl" />
+          {{data.nickname}}
+        </template>
+      </TableItem>
+      <TableItem title="OpenId" prop="openid"></TableItem>
+      <TableItem title="国家" prop="country"></TableItem>
+      <TableItem title="省份" prop="province"></TableItem>
+      <TableItem title="城市" prop="city"></TableItem>
+      <TableItem title="标签">
+        <template slot-scope="{data}">
+          <span class="h-tag" v-for="tag in data.tags" v-bind:key="tag.id">{{tag.name}}</span>
+          <button class="h-btn h-btn-s h-btn-blue" style="float: right" @click="edit(data.id)">
+            <i class="h-icon-edit"></i>
+          </button>
+        </template>
+      </TableItem>
+      <div slot="empty">自定义提醒：暂时无数据</div>
+    </Table>
+    <Pagination
+      align="center"
+      :cur="page.pageable.pageNumber"
+      :total="page.totalElements"
+      :size="page.size"
+      @change="changePage($event)"
+    ></Pagination>
   </div>
 </template>
 
@@ -18,9 +45,14 @@ export default {
       // 所有的微信账号
       accounts: [{ title: "加载中..." }],
       // 选中的微信账号
-      selectedAccount: { account: null },
-      pageNumber: 0,
-      keyword: null
+      selectedAccount: { key: null },
+      keyword: null,
+
+      loading: false,
+      page: {
+        pageable: {},
+        size: 10
+      }
     };
   },
   mounted() {
@@ -29,6 +61,7 @@ export default {
   watch: {
     selectedAccount(account) {
       if (account && account.key) {
+        this.loadUserInfo(account.key);
       }
     }
   },
@@ -41,6 +74,34 @@ export default {
       axios.get(url).then(response => {
         this.accounts = response.data;
       });
+    },
+    loadUserInfo(account) {
+      this.loading = true;
+      let url = `/api/we-chat/user/users/${account}`;
+      let data = {
+        kw: this.keyword,
+        pn: this.page.pageable.pageNumber
+          ? this.page.pageable.pageNumber - 1
+          : 0,
+        ps: this.page.size ? this.page.size : 10
+      };
+      axios
+        .get(url, { params: data })
+        .then(response => {
+          this.loading = false;
+          this.page = response.data;
+          this.page.pageable.pageNumber = this.page.pageable.pageNumber + 1;
+        })
+        .catch(error => (this.loading = false));
+    },
+    changePage(event) {
+      this.page.pageable.pageNumber = event.page;
+      this.page.size = event.size;
+      this.loadUserInfo(this.selectedAccount.key);
+    },
+    edit(id) {
+      // 切换到编辑页面
+      this.$router.push("/admin/wechat/user/" + id);
     }
   }
 };

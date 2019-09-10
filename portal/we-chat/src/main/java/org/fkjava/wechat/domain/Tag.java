@@ -1,6 +1,7 @@
 package org.fkjava.wechat.domain;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
 import org.hibernate.annotations.GenericGenerator;
@@ -12,6 +13,9 @@ import java.util.List;
 @Entity
 @Getter
 @Setter
+@Table(indexes = {
+        @Index(name = "search_by_account_and_id", columnList = "account, weChatTagId")
+})
 public class Tag {
     @Id
     @GenericGenerator(name = "uuid2", strategy = "uuid2")
@@ -25,7 +29,8 @@ public class Tag {
     // 微信公众号平台上面的id
     // 新建一个标签的时候，需要把标题提交到公众号平台，才能返回标签的id
     // 修改公众号平台上面的标签，需要携带此id
-    private int id;
+    @JsonProperty("id")
+    private Integer weChatTagId;
     // 标签的名称
     private String name;
     // 是否临时标签，临时标签由程序启动的时候自动处理

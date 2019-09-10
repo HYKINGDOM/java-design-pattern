@@ -5,7 +5,7 @@
         <Select v-model="selectedAccount" :datas="accounts" :deletable="false" type="object"></Select>
       </FormItem>
     </Form>
-    <Row>
+    <Row v-if="selectedAccount.key">
       <Cell width="6">
         <div class="tags">
           <div
@@ -59,7 +59,7 @@ export default {
       // 所有的微信账号
       accounts: [{ title: "加载中..." }],
       // 选中的微信账号
-      selectedAccount: { account: null },
+      selectedAccount: { title: null, key: null },
       pageNumber: 0,
       keyword: null,
       // 选中的组、标签，当点击的时候选中
@@ -74,7 +74,7 @@ export default {
       transferOptions: {
         ltHeadText: "未选择",
         rtHeadText: "已选择",
-        filterable: true,
+        filterable: false,
         placeholder: "关键字搜索"
         // ,
         // // 负责如何显示文本内容
@@ -126,7 +126,7 @@ export default {
         });
     },
     loadUsers(account) {
-      let url = "/api/we-chat/user/" + account;
+      let url = "/api/we-chat/user/names/" + account;
       axios
         .get(url)
         .then(response => {
@@ -154,13 +154,11 @@ export default {
       let tag = this.selectedTag;
       tag.account = this.selectedAccount.key;
       let url = "/api/we-chat/tag";
-      axios
-        .post(url, tag)
-        .then(response => {
-          this.$Message("标签保存成功");
-          // 重新加载标签的数据，更新标签列表
-          this.loadTags(tag.account);
-        });
+      axios.post(url, tag).then(response => {
+        this.$Message("标签保存成功");
+        // 重新加载标签的数据，更新标签列表
+        this.loadTags(tag.account);
+      });
     }
   }
 };
