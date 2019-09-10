@@ -8,6 +8,7 @@ import org.springframework.boot.autoconfigure.domain.EntityScan;
 import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
 import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.DelegatingPasswordEncoder;
@@ -32,6 +33,7 @@ import java.util.Map;
 @EnableFeignClients(clients = VerifyCodeService.class)
 // 由于user-center里面的User相关的类，放在user-center-domain包里面，如果需要得到实体里面需要扫描！
 @EntityScan("org.fkjava")
+@EnableGlobalMethodSecurity(jsr250Enabled = true, securedEnabled = true, prePostEnabled = true)
 public class UserCenterApp
         // 继承OAuth2ResourceConfig其实就是为了得到OAuth 2资源服务器的配置
         extends OAuth2ResourceConfig {

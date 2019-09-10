@@ -1,5 +1,6 @@
 package org.fkjava.user.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.*;
 import org.hibernate.annotations.GenericGenerator;
 
@@ -28,10 +29,13 @@ public class User implements Serializable {
     private String tenantId;
     private String openId;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss", locale = "GMT+8")
     private Date registeredTime;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss", locale = "GMT+8")
     private Date passwordExpireTime;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss", locale = "GMT+8")
     private Date accountExpireTime;
     private boolean accountNonLocked;
     private boolean enabled;

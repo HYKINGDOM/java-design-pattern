@@ -312,4 +312,16 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
         }
         return id;
     }
+
+    @Override
+    public UserInfo findUserById(String openId) {
+        UserInfo userInfo = this.userInfoRepository.findById(openId).orElse(null);
+        if (userInfo == null) {
+            return null;
+        }
+        List<Integer> tagIdList = userInfo.getTagIdList();
+        List<Tag> tags = this.tagRepository.findByAccountAndWeChatTagIdIn(userInfo.getAccount(), tagIdList);
+        userInfo.setTags(tags);
+        return userInfo;
+    }
 }

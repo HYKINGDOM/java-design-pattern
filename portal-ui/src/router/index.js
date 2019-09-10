@@ -56,8 +56,19 @@ let router = new Router({
                 },
                 {
                   path: 'user',
-                  name: '微信用户管理',
-                  component: (resolve) => require(['@/components/admin/wechat/User'], resolve)
+                  component: EmptyRouterView,
+                  children: [
+                    {
+                      path: '',
+                      name: '微信用户管理',
+                      component: (resolve) => require(['@/components/admin/wechat/User'], resolve)
+                    },
+                    {
+                      path: ':id',
+                      name: '修改微信用户信息',
+                      component: (resolve) => require(['@/components/admin/wechat/UserEdit'], resolve)
+                    }
+                  ]
                 }
               ]
             },

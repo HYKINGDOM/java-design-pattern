@@ -17,4 +17,14 @@ public interface UserService {
     User loadByOpenId(String openId);
 
     User loadByPhone(String phone);
+
+    Result updatePhone(String id, String phone, String verifyCode);
+
+    Result updateLoginName(String id, String loginName);
+
+    Result updateAccountNonLocked(String id, boolean accountNonLocked);
+
+    Result updateEnabled(String id, boolean enabled);
+
+    Result updatePassword(String id, String password);
 }

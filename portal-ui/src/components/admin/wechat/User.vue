@@ -19,6 +19,9 @@
       <TableItem title="标签">
         <template slot-scope="{data}">
           <span class="h-tag" v-for="tag in data.tags" v-bind:key="tag.id">{{tag.name}}</span>
+          <button class="h-btn h-btn-s h-btn-blue" style="float: right" @click="edit(data.id)">
+            <i class="h-icon-edit"></i>
+          </button>
         </template>
       </TableItem>
       <div slot="empty">自定义提醒：暂时无数据</div>
@@ -74,7 +77,7 @@ export default {
     },
     loadUserInfo(account) {
       this.loading = true;
-      let url = `/api/we-chat/user/${account}`;
+      let url = `/api/we-chat/user/users/${account}`;
       let data = {
         kw: this.keyword,
         pn: this.page.pageable.pageNumber
@@ -95,6 +98,10 @@ export default {
       this.page.pageable.pageNumber = event.page;
       this.page.size = event.size;
       this.loadUserInfo(this.selectedAccount.key);
+    },
+    edit(id) {
+      // 切换到编辑页面
+      this.$router.push("/admin/wechat/user/" + id);
     }
   }
 };

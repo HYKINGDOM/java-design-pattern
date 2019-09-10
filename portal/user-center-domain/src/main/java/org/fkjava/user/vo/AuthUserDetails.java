@@ -1,5 +1,6 @@
 package org.fkjava.user.vo;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
@@ -19,8 +20,11 @@ public class AuthUserDetails extends User {
     private String phone;
     private String tenantId;
     private String openId;
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss", locale = "GMT+8")
     private Date registeredTime;
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss", locale = "GMT+8")
     private Date passwordExpireTime;
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss", locale = "GMT+8")
     private Date accountExpireTime;
 
     public AuthUserDetails() {

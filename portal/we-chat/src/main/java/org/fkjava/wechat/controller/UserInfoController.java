@@ -23,7 +23,7 @@ public class UserInfoController {
         return this.weiXinService.findUserNames(account, pageNumber, pageSize, keyword);
     }
 
-    @GetMapping("{account}")
+    @GetMapping("users/{account}")
     public Page<UserInfo> allUsers(
             @PathVariable("account") String account,
             @RequestParam(name = "pn", defaultValue = "0") int pageNumber,
@@ -31,5 +31,10 @@ public class UserInfoController {
             @RequestParam(name = "kw", required = false) String keyword
     ) {
         return this.weiXinService.findUsers(account, pageNumber, pageSize, keyword);
+    }
+    @GetMapping("{openId}")
+    public UserInfo findUserByOpenId(
+            @PathVariable String openId) {
+        return this.weiXinService.findUserById(openId);
     }
 }

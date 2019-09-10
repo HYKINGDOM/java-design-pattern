@@ -38,4 +38,6 @@ public interface WeiXinService {
     Result saveTag(Tag tag);
 
     Page<UserInfo> findUserNames(String account, int pageNumber, int pageSize, String keyword);
+
+    UserInfo findUserById(String openId);
 }

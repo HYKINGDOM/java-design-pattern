@@ -1,5 +1,6 @@
 package org.fkjava.wechat.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
 import lombok.Setter;
@@ -129,6 +130,7 @@ public class UserInfo {
     private String qrSceneValue;
 
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss", locale = "GMT+8")
     private Date subscribeDate;
     // 默认为true，取消关注以后为false
     private boolean enable = true;

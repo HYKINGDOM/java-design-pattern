@@ -70,7 +70,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional
+    @Transactional(readOnly = true)
     public User loadById(String id) {
         Optional<User> userOptional = this.userRepository.findById(id);
         if (userOptional.isPresent()) {
@@ -190,5 +190,45 @@ public class UserServiceImpl implements UserService {
         user.setPasswordExpireTime(
                 new Date(System.currentTimeMillis() + passwordExpireTime)
         );
+    }
+
+    @Override
+    @Transactional
+    public Result updateLoginName(String id, String loginName) {
+        this.userRepository.findById(id).ifPresent(user -> user.setLoginName(loginName));
+        return Result.ok("用户登录名修改成功");
+    }
+
+    @Override
+    @Transactional
+    public Result updatePhone(String id, String phone, String verifyCode) {
+        Result result = this.verifyCodeService.verify(phone, verifyCode);
+        if (result.getCode() == 1) {
+            this.userRepository.findById(id).ifPresent(user -> user.setPhone(phone));
+            return Result.ok("手机号码修改成功");
+        } else {
+            return result;
+        }
+    }
+
+    @Override
+    @Transactional
+    public Result updateAccountNonLocked(String id, boolean accountNonLocked) {
+        this.userRepository.findById(id).ifPresent(user -> user.setAccountNonLocked(accountNonLocked));
+        return Result.ok("账户锁定状态修改成功");
+    }
+
+    @Override
+    @Transactional
+    public Result updateEnabled(String id, boolean enabled) {
+        this.userRepository.findById(id).ifPresent(user -> user.setEnabled(enabled));
+        return Result.ok("用户禁用状态修改成功");
+    }
+
+    @Override
+    @Transactional
+    public Result updatePassword(String id, String password) {
+        this.userRepository.findById(id).ifPresent(user -> user.setPassword(this.passwordEncoder.encode(password)));
+        return Result.ok("用户登录密码修改成功");
     }
 }
