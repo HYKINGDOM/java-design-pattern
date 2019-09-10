@@ -1,10 +1,13 @@
 package org.fkjava.wechat.controller;
 
 import org.fkjava.commons.domain.Result;
+import org.fkjava.wechat.domain.Tag;
 import org.fkjava.wechat.domain.UserInfo;
 import org.fkjava.wechat.service.WeiXinService;
 import org.springframework.data.domain.Page;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("/user")
@@ -45,5 +48,15 @@ public class UserInfoController {
     @PostMapping("update-remark")
     public Result updateRemark(String id, String remark) {
        return this.weiXinService.updateRemark(id, remark);
+    }
+
+    @GetMapping("tags/{id}")
+    public List<Tag> findTagsByUserId(@PathVariable String id){
+        return this.weiXinService.findTagsByUserId(id);
+    }
+
+    @PostMapping("update-tags")
+    public Result updateTags(String id, String[] tagId) {
+        return this.weiXinService.updateTags(id, tagId);
     }
 }

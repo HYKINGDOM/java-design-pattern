@@ -93,6 +93,21 @@
         </Form>
       </Cell>
     </Row>
+    <Row>
+      <Cell width="12">
+        <Transfer
+          style="width: 100%; margin-top: 10px;"
+          v-model="selectedTags"
+          :datas="allTags"
+          :option="selectTagOption"
+        >
+          <template slot-scope="{option}" slot="item">{{option.text}}({{option.id}})</template>
+        </Transfer>
+        <div class="text-right">
+          <Button color="primary" @click="changeTags">保存</Button>
+        </div>
+      </Cell>
+    </Row>
   </div>
 </template>
 
@@ -105,7 +120,6 @@ export default {
       userInfo: null,
       user: null,
       account: null,
-      allTags: [],
       loginNameEditable: false,
       phone: {
         disabled: true,
@@ -117,6 +131,12 @@ export default {
       userFormValidationRules: {
         required: ["phone"],
         mobile: ["phone"]
+      },
+      selectedTags: [],
+      allTags: [],
+      selectTagOption: {
+        ltHeadText: "未选择标签",
+        rtHeadText: "已选择标签"
       }
     };
   },
@@ -150,9 +170,24 @@ export default {
       });
     },
     getAllTags(account) {
-      let url = "/api/we-chat/tag/" + account;
+      let url = "/api/we-chat/tag/non-users/" + account;
       axios.get(url).then(response => {
-        this.allTags = response.data;
+        this.getUserTags(this.userInfo.id);
+        this.allTags = response.data.map(tag => {
+          return {
+            key: tag.tagId,
+            id: tag.id,
+            text: tag.name
+          };
+        });
+      });
+    },
+    getUserTags(id) {
+      let url = "/api/we-chat/user/tags/" + id;
+      axios.get(url).then(response => {
+        this.selectedTags = response.data.map(tag => {
+          return tag.tagId;
+        });
       });
     },
     setLoginName() {
@@ -279,6 +314,23 @@ export default {
           this.$Message({ type: "error", text: result.message });
         }
       });
+    },
+    changeTags() {
+      if (this.selectedTags && this.selectedTags.length > 0) {
+        let data = new FormData();
+        data.append("id", this.userInfo.id);
+        this.selectedTags.forEach(tagId => {
+          data.append("tagId", tagId);
+        });
+        axios.post("/api/we-chat/user/update-tags", data).then(response => {
+          let result = response.data;
+          let type = "success";
+          if (result.code !== 1) {
+            type = "error";
+          }
+          this.$Message({ type: type, text: result.message });
+        });
+      }
     }
   }
 };

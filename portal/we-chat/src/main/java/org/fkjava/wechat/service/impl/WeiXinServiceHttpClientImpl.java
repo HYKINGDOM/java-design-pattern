@@ -139,11 +139,11 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
     }
 
     @Override
-    public Page<Tag> findTags(String account, int pageNumber, String keyword) {
+    public Page<Tag> findTags(String account, int pageNumber, int pageSize, String keyword) {
         Assert.notNull(account, "微信公众号的账号不能为空！");
         // 查询所有的非临时标签，如果有关键字则根据关键字搜索（名称）
         Sort sort = Sort.by(Sort.Order.asc("name"));//排序条件
-        Pageable pageable = PageRequest.of(pageNumber, 10, sort);
+        Pageable pageable = PageRequest.of(pageNumber, pageSize, sort);
 
         Specification<Tag> spec = (root, query, builder) -> {
             // 只查询temporary为true的 标签
@@ -226,20 +226,9 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
         tag.setTemporary(false);//自己添加的标签，就不是临时标签
         // 3.把标签发送给微信公众号平台，保存以后会返回一个数字的id（Tag对象），需要更新本地数据库的Tag对象
 
-        // 标签在页面上选择了某个公众号以后，本身就携带了公众号的微信账号，通过微信账号来查找配置参数。
-        Map<String, String> params = this.createParams(tag.getAccount());
+        updateTagUsers(tag);
 
-        Integer id = createOrUpdateTag(params, tag);
         this.tagRepository.save(tag);
-
-        // 把用户批量添加到标签里面
-        List<String> openIds = new LinkedList<>();
-        tag.getUserInfos().forEach(userInfo -> openIds.add(userInfo.getOpenId()));
-        Map<String, Object> addUsersMap = new HashMap<>();
-        addUsersMap.put("openid_list", openIds);
-        addUsersMap.put("tagid", id);
-        HttpClientProxy.post("/tags/members/batchtagging", params, addUsersMap);
-
         // 把标签的ID跟用户信息关联起来
         tag.getUserInfos().forEach(userInfo -> {
             if (userInfo.getTagIdList() == null) {
@@ -253,6 +242,21 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
         });
 
         return Result.ok("标签保存成功");
+    }
+
+    private void updateTagUsers(Tag tag) {
+        // 标签在页面上选择了某个公众号以后，本身就携带了公众号的微信账号，通过微信账号来查找配置参数。
+        Map<String, String> params = this.createParams(tag.getAccount());
+
+        Integer id = createOrUpdateTag(params, tag);
+
+        // 把用户批量添加到标签里面
+        List<String> openIds = new LinkedList<>();
+        tag.getUserInfos().forEach(userInfo -> openIds.add(userInfo.getOpenId()));
+        Map<String, Object> addUsersMap = new HashMap<>();
+        addUsersMap.put("openid_list", openIds);
+        addUsersMap.put("tagid", id);
+        HttpClientProxy.post("/tags/members/batchtagging", params, addUsersMap);
     }
 
     private Integer createOrUpdateTag(Map<String, String> params, Tag tag) {
@@ -272,7 +276,7 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
 
         Map<String, Object> tagMap = new LinkedHashMap<>();
         if (tag.getWeChatTagId() != null) {
-            log.trace("修改已有的标签，标签ID为: {}", tag.getWeChatTagId());
+            log.trace("修改已有的标签，标签ID为: {}，新标签名称: {}", tag.getWeChatTagId(), tag.getName());
             // 有微信的标签ID，则修改记录
             uri = "/tags/update";
             tagMap.put("id", tag.getWeChatTagId());
@@ -284,7 +288,7 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
 
         Map<String, ?> result = HttpClientProxy.post(uri, params, data);
         Integer id;
-        if (tag.getWeChatTagId() != null) {
+        if (tag.getWeChatTagId() == null) {
             Map<?, ?> resultTagMap = (Map<?, ?>) result.get("tag");
             if (resultTagMap == null) {
                 // 出现错误的情况下就没有名为tag的属性返回
@@ -351,5 +355,58 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
         Map<String, String> params = new HashMap<>();
         params.put("access_token", token.getToken());
         return params;
+    }
+
+    @Override
+    public List<Tag> findTagsByUserId(String id) {
+        UserInfo userInfo = this.userInfoRepository.findById(id).orElse(null);
+        if (userInfo == null) {
+            throw new RuntimeException("请求参数错误，无效的用户信息ID");
+        }
+        // 把用户关联的所有标签查询出来，然后转换为只有id、名称、微信公众号的标签
+        List<Tag> tags = this.tagRepository.findByUserInfosIn(List.of(userInfo));
+        return tags.stream()
+                .map(tag -> {
+                    Tag t = new Tag();
+                    t.setName(tag.getName());
+                    t.setWeChatTagId(tag.getWeChatTagId());
+                    t.setTagId(tag.getTagId());
+                    t.setTemporary(tag.isTemporary());
+                    t.setAccount(tag.getAccount());
+                    return t;
+                })
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    @Transactional
+    public Result updateTags(String id, String[] tagId) {
+        List<Tag> tags = this.tagRepository.findAllById(List.of(tagId));
+        if (tags.isEmpty()) {
+            return Result.error("请求参数错误，无效的用户标签ID");
+        }
+        UserInfo userInfo = this.userInfoRepository.findById(id).orElse(null);
+        if (userInfo == null) {
+            return Result.error("请求参数错误，无效的用户信息ID");
+        }
+
+        // 先把当前用户关联的所有标签全部删除，然后重新加入
+        List<Tag> oldTags = this.tagRepository.findByUserInfosIn(List.of(userInfo));
+        log.trace("更新 {} 的微信用户标签: \n源标签：{}\n新标签: {}",
+                userInfo.getNickName(),
+                oldTags.stream().map(Tag::getName).collect(Collectors.toList()),
+                tags.stream().map(Tag::getName).collect(Collectors.toList()));
+        oldTags.forEach(tag -> {
+            List<UserInfo> removed = tag.getUserInfos().stream()
+                    .filter(ui -> ui.getId().equals(userInfo.getId()))
+                    .collect(Collectors.toList());
+            tag.getUserInfos().removeAll(removed);
+        });
+        tags.forEach(tag -> tag.getUserInfos().add(userInfo));
+
+        // 把用户的标签，更新到微信公众号平台
+        tags.forEach(this::updateTagUsers);
+
+        return Result.ok("用户标签更新成功");
     }
 }
