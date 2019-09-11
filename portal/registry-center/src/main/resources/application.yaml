@@ -19,4 +19,4 @@ spring:
     name: registry-center
 logging:
   level:
-    root: error`
+    root: error
