@@ -28,6 +28,11 @@ export default [
                 title: "配送地址",
                 icon: "icon-paper",
                 key: "/user/address"
+            },
+            {
+                title: "我的文件",
+                icon: "icon-file",
+                key: "/user/file"
             }
         ]
     }
