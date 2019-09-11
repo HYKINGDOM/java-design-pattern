@@ -77,7 +77,13 @@ export default {
         // 选中菜单项目的时候，是根据路由的name来选中的，意味着name要跟菜单的key相同
         // $refs是一个Vue对象里面的共享对象，可以把组件通过共享对象在多个不同的组件之间传递
         // 只要在组件什么使用ref='menu'（menu可变），就会把组件注册到共享对象里面
-        this.$refs.leftMenu.select(this.$route.path);
+        let matchedMenu = this.matchedMenu(
+          this.$refs.leftMenu.$children,
+          this.$route.path
+        );
+        if (matchedMenu) {
+          this.$refs.leftMenu.select(this.$route.path);
+        }
 
         // 显示页面顶部导航路径（面包屑）
         let data = this.$route.matched
@@ -91,6 +97,23 @@ export default {
           this.breadcrumbDatas = [];
         }
       }
+    },
+    /**
+     * 检查路径是否跟菜单的key匹配，匹配的时候就要切换菜单，否则不切换。
+     */
+    matchedMenu(children, path) {
+      let _this = this;
+      for (let i = 0; i < children.length; i++) {
+        let menu = children[i];
+        if (path === menu.$options.propsData.data.key) {
+          return true;
+        }
+        let next = _this.matchedMenu(menu.$children, path);
+        if (next) {
+          return true;
+        }
+      }
+      return false;
     },
     trigger(data) {
       if (
