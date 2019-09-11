@@ -16,12 +16,9 @@ export default {
   },
   methods: {
     logout() {
-      //this.$router.push("/login");
+      this.$store.commit("updateAccount", {});
       axios.post("/api/logout").then(response => {
         this.$router.replace("/login");
-        this.$store.commit("updateAccount", {});
-        console.log(this.$store.state.User);
-        console.log(User);
       });
     },
     loadUserInfo() {
