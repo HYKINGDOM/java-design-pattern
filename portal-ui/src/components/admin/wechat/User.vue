@@ -19,7 +19,7 @@
       <TableItem title="标签">
         <template slot-scope="{data}">
           <span class="h-tag" v-for="tag in data.tags" v-bind:key="tag.id">{{tag.name}}</span>
-          <button class="h-btn h-btn-s h-btn-blue" style="float: right" @click="edit(data.id)">
+          <button class="h-btn h-btn-s h-btn-blue" style="float: right" @click="edit(data.openid)">
             <i class="h-icon-edit"></i>
           </button>
         </template>
