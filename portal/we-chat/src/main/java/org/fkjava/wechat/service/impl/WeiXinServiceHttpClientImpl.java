@@ -311,7 +311,7 @@ public class WeiXinServiceHttpClientImpl implements WeiXinService {
 
     @Override
     public UserInfo findUserById(String openId) {
-        UserInfo userInfo = this.userInfoRepository.findById(openId).orElse(null);
+        UserInfo userInfo = this.userInfoRepository.findByOpenId(openId);
         if (userInfo == null) {
             return null;
         }

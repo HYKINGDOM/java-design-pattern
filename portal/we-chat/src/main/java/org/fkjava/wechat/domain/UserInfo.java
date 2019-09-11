@@ -18,7 +18,8 @@ import java.util.stream.Collectors;
 @Table(
         indexes = {
                 @Index(name = "search_table", columnList = "enable, account"),
-                @Index(name = "search_table_order", columnList = "enable, account, nickName")
+                @Index(name = "search_table_order", columnList = "enable, account, nickName"),
+                @Index(name = "by_openid", columnList = "openId")
         }
 )
 public class UserInfo {
