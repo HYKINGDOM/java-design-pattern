@@ -111,7 +111,6 @@ export default {
       axios.get(url).then(response => {
         this.user = response.data;
         this.loginNameEditable = this.user.loginName === this.user.openId;
-        console.log(this.user);
         this.getUserInfo(this.user.openId);
       });
     },
