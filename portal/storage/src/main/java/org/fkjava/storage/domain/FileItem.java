@@ -1,5 +1,6 @@
 package org.fkjava.storage.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import org.hibernate.annotations.GenericGenerator;
 
 import javax.persistence.*;
@@ -20,6 +21,7 @@ public class FileItem {
     @Column(length = 36)
     private String userId;
     @Temporal(TemporalType.TIMESTAMP)
+    @JsonFormat(pattern = "yyyy年MM月dd日HH:mm:ss")
     private Date uploadTime;
 
     public String getId() {

@@ -1,20 +1,28 @@
 package org.fkjava.storage.controller;
 
+import lombok.extern.slf4j.Slf4j;
+import org.apache.commons.io.IOUtils;
 import org.fkjava.commons.domain.Result;
 import org.fkjava.storage.domain.FileItem;
 import org.fkjava.storage.service.StorageService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBody;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
+import java.nio.charset.Charset;
 import java.security.Principal;
 
 @RestController
 @RequestMapping("/file")
+@Slf4j
 public class FileController {
 
     @Autowired
@@ -22,12 +30,15 @@ public class FileController {
 
     @GetMapping
     public Page<FileItem> list(
+            @AuthenticationPrincipal Principal principal,
             @RequestParam(value = "kw", required = false) String keyword,
             @RequestParam(value = "pn", defaultValue = "0") int pageNumber,
+            @RequestParam(value = "ps", defaultValue = "10") int pageSize,
             @RequestParam(value = "ob", defaultValue = "name") String orderBy,
             @RequestParam(value = "d", defaultValue = "ASC") String direction
     ) {
-        return this.storageService.search(keyword, orderBy, direction, pageNumber);
+        String userId = principal.getName();
+        return this.storageService.search(userId, keyword, orderBy, direction, pageNumber, pageSize);
     }
 
     @PostMapping
@@ -35,13 +46,42 @@ public class FileController {
             @RequestPart() MultipartFile file,
             @AuthenticationPrincipal Principal principal)
             throws IOException {
-
-        System.out.println(principal);
+        String userId = principal.getName();
         String name = file.getOriginalFilename();
         String type = file.getContentType();
         long length = file.getSize();
         try (InputStream in = file.getInputStream()) {
-            return this.storageService.save(name, type, length, in);
+            return this.storageService.save(userId, name, type, length, in);
         }
+    }
+
+    @DeleteMapping("{id}")
+    public Result delete(@PathVariable String id) {
+        return this.storageService.delete(id);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity<StreamingResponseBody> download(@PathVariable String id) {
+        FileItem fileItem = this.storageService.getFileItem(id);
+
+        if (fileItem == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        ResponseEntity.BodyBuilder builder = ResponseEntity.ok();
+        builder.contentLength(fileItem.getLength());
+        builder.contentType(MediaType.valueOf(fileItem.getContentType()));
+        String name = fileItem.getName();
+        String encodedName = URLEncoder.encode(name, Charset.forName("UTF-8"));
+        builder.header("Content-Disposition", "attachment;filename*=UTF-8''" + encodedName);
+
+        ResponseEntity<StreamingResponseBody> entity = builder.body(outputStream -> {
+            InputStream fileContent = this.storageService.getFileContent(fileItem);
+            if (fileContent == null) {
+                throw new IOException("无法得到文件内容，请跟踪详细异常日志！");
+            }
+            IOUtils.copy(fileContent, outputStream);
+        });
+        return entity;
     }
 }

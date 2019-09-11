@@ -31,6 +31,8 @@ public class CommonConfigProperties {
      * 以公众号的微信号为key存储
      */
     private Map<String, WeChat> weChats = new HashMap<>();
+    private Storage storage;
+
     private Function<Map.Entry<String, WeChat>, WeChat> weChatFunction = kv -> {
         kv.getValue().setAccount(kv.getKey());
         return kv.getValue();
@@ -99,5 +101,25 @@ public class CommonConfigProperties {
          * 加密通讯时使用的密钥，用于加密数据和解密数据。
          */
         private String encodingKey;
+    }
+
+    @Getter
+    @Setter
+    public static class Storage {
+
+
+        public enum Type {
+            fs,
+            db
+        }
+
+        /**
+         * 文件存储类型，默认存储到数据库
+         */
+        private Type type = Type.db;
+        /**
+         * 文件存储目录，默认存储到/tmp/storage目录下，如果type是{@link Storage.Type#fs}才生效
+         */
+        private String dir = "/tmp/storage";
     }
 }
