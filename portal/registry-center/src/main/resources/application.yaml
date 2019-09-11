@@ -17,3 +17,6 @@ eureka:
 spring:
   application:
     name: registry-center
+logging:
+  level:
+    root: error

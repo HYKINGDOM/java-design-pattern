@@ -39,7 +39,12 @@ export default [
                 path: 'trace/:id',
                 name: '配送物流跟踪',
                 component: (resolve) => require(['@/components/user/DistributionTrace'], resolve)
-            }
+            },
+            {
+                path: 'file',
+                name: '我的文件',
+                component: (resolve) => require(['@/components/user/File.vue'], resolve)
+            },
         ]
     }
 ]
