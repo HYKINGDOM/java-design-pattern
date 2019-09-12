@@ -16,7 +16,8 @@
           <TagInput v-model="article.tagNames" :limit="10" :wordlimit="20"></TagInput>
         </FormItem>
       </div>
-      <div ref="content"></div>
+      <div ref="editorBar" class="editor editor-toolbar"></div>
+      <div ref="editorContent" class="editor editor-content"></div>
     </Form>
     <div class="text-right">
       <Button @click="resetForm">重置</Button>
@@ -44,10 +45,49 @@ export default {
   },
   mounted() {
     // 创建富文本编辑器的实例
-    editor = new E(this.$refs.content);
+    editor = new E(this.$refs.editorBar, this.$refs.editorContent);
     editor.customConfig.onchange = html => {
       // 当富文本编辑器的内容发生变化，同步到文章的内容属性里面
       this.article.content = html;
+    };
+    editor.customConfig.uploadImgServer = "/api/storage/file";
+    // 最大文件限制
+    editor.customConfig.uploadImgMaxSize = 10 * 1024 * 1024;
+    // 上传文件的属性名称
+    editor.customConfig.uploadFileName = "file";
+    // 自定义文件上传事件监听
+    editor.customConfig.uploadImgHooks = {
+      before: function(xhr, editor, files) {
+        // 图片上传之前触发
+        // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，files 是选择的图片文件
+        // 如果返回的结果是 {prevent: true, msg: 'xxxx'} 则表示用户放弃上传
+        // return {
+        //     prevent: true,
+        //     msg: '放弃上传'
+        // }
+      },
+      success: function(xhr, editor, result) {
+        // 图片上传并返回结果，图片插入成功之后触发
+        // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，result 是服务器端返回的结果
+      },
+      fail: function(xhr, editor, result) {
+        // 图片上传并返回结果，但图片插入错误时触发
+        // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象，result 是服务器端返回的结果
+      },
+      error: function(xhr, editor) {
+        // 图片上传出错时触发
+        // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
+      },
+      timeout: function(xhr, editor) {
+        // 图片上传超时时触发
+        // xhr 是 XMLHttpRequst 对象，editor 是编辑器对象
+      },
+      // 如果服务器端返回的不是 {errno:0, data: [...]} 这种格式，可使用该配置
+      // （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
+      customInsert: function(insertImg, result, editor) {
+        var url = `/api/storage/file/download/${result.attachment}`;
+        insertImg(url);
+      }
     };
     editor.create();
 
@@ -136,5 +176,12 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+.editor {
+  border: 1px solid #ccc;
+}
+.editor-content {
+  border-top: none;
+  height: 600px;
+}
 </style>

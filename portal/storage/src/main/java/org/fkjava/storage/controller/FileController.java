@@ -5,7 +5,6 @@ import org.apache.commons.io.IOUtils;
 import org.fkjava.commons.domain.Result;
 import org.fkjava.storage.domain.FileItem;
 import org.fkjava.storage.service.StorageService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -17,7 +16,7 @@ import org.springframework.web.servlet.mvc.method.annotation.StreamingResponseBo
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 
 @RestController
@@ -25,8 +24,11 @@ import java.security.Principal;
 @Slf4j
 public class FileController {
 
-    @Autowired
-    private StorageService storageService;
+    private final StorageService storageService;
+
+    public FileController(StorageService storageService) {
+        this.storageService = storageService;
+    }
 
     @GetMapping
     public Page<FileItem> list(
@@ -51,6 +53,7 @@ public class FileController {
         String type = file.getContentType();
         long length = file.getSize();
         try (InputStream in = file.getInputStream()) {
+            // 返回的结果中，attachment属性是FileItem对象的id，通过此id可以下载文件
             return this.storageService.save(userId, name, type, length, in);
         }
     }
@@ -60,7 +63,13 @@ public class FileController {
         return this.storageService.delete(id);
     }
 
+
     @GetMapping("{id}")
+    public FileItem get(@PathVariable String id) {
+        return this.storageService.getFileItem(id);
+    }
+
+    @GetMapping("download/{id}")
     public ResponseEntity<StreamingResponseBody> download(@PathVariable String id) {
         FileItem fileItem = this.storageService.getFileItem(id);
 
@@ -72,16 +81,15 @@ public class FileController {
         builder.contentLength(fileItem.getLength());
         builder.contentType(MediaType.valueOf(fileItem.getContentType()));
         String name = fileItem.getName();
-        String encodedName = URLEncoder.encode(name, Charset.forName("UTF-8"));
+        String encodedName = URLEncoder.encode(name, StandardCharsets.UTF_8);
         builder.header("Content-Disposition", "attachment;filename*=UTF-8''" + encodedName);
 
-        ResponseEntity<StreamingResponseBody> entity = builder.body(outputStream -> {
+        return builder.body(outputStream -> {
             InputStream fileContent = this.storageService.getFileContent(fileItem);
             if (fileContent == null) {
                 throw new IOException("无法得到文件内容，请跟踪详细异常日志！");
             }
             IOUtils.copy(fileContent, outputStream);
         });
-        return entity;
     }
 }
