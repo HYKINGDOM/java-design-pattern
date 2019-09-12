@@ -13,6 +13,7 @@ import org.springframework.context.annotation.FilterType;
 import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 import org.springframework.data.keyvalue.repository.KeyValueRepository;
 import org.springframework.data.redis.repository.configuration.EnableRedisRepositories;
+import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.oauth2.config.annotation.web.configuration.EnableResourceServer;
 
@@ -31,6 +32,7 @@ import org.springframework.security.oauth2.config.annotation.web.configuration.E
 @EnableRedisRepositories(includeFilters = {
         @ComponentScan.Filter(classes = KeyValueRepository.class, type = FilterType.ASSIGNABLE_TYPE)
 })
+@EnableAsync
 public class WeChatApp extends OAuth2ResourceConfig {
 
     @Override
