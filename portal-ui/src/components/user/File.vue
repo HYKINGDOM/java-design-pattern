@@ -61,7 +61,7 @@ export default {
   computed: {
     download(id) {
       return function(id) {
-        return `/api/storage/file/${id}`;
+        return `/api/storage/file/download/${id}`;
       };
     }
   },

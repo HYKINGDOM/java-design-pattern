@@ -85,7 +85,7 @@ export default {
       // 如果服务器端返回的不是 {errno:0, data: [...]} 这种格式，可使用该配置
       // （但是，服务器端返回的必须是一个 JSON 格式字符串！！！否则会报错）
       customInsert: function(insertImg, result, editor) {
-        var url = `/api/storage/file/${result.attachment}`;
+        var url = `/api/storage/file/download/${result.attachment}`;
         insertImg(url);
       }
     };
