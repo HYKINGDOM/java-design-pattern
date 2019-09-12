@@ -1,0 +1,17 @@
+server:
+  port: 20004
+spring:
+  datasource:
+    url: jdbc:mysql://127.0.0.1:3306/cloud?useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
+    username: root
+    password: 1234
+  jpa:
+    # 配置JPA自动生成数据库表
+    generate-ddl: true
+    properties:
+      # 配置Hibernate的方言
+      hibernate.dialect: org.hibernate.dialect.MySQL8Dialect
+fk:
+  storage:
+    type: fs
+    dir: /home/data/var/tmp/storage
