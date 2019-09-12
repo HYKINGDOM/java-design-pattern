@@ -121,7 +121,11 @@ public class StorageServiceImpl implements StorageService {
         // 保存文件信息到数据库
         this.fileItemRepository.save(item);
 
-        return Result.ok("文件上传成功");
+        String id = item.getId();
+        Result result = Result.ok("文件上传成功");
+        result.setAttachment(id);
+
+        return result;
     }
 
     @Override
