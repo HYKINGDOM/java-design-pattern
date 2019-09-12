@@ -4,6 +4,7 @@ fk:
   api-prefix: ${fk.host-prefix}${fk.api-path}
 logging:
   level:
+    root: ERROR
     org:
       fkjava: TRACE
       hibernate:
