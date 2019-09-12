@@ -31,6 +31,7 @@
 
 <script>
 import axios from "axios";
+import loadUserInfo from "./LoadUserInfo";
 export default {
   data() {
     return {
@@ -72,6 +73,7 @@ export default {
           })
           .then(result => {
             this.isLoading = false;
+            loadUserInfo(this.$store);
             this.$router.replace("/");
           })
           .catch(e => {
