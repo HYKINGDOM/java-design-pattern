@@ -5,6 +5,7 @@
     <!-- <property name="LOG_FILE" value="/tmp/logs/tenant.log" /> -->
     <include
             resource="org/springframework/boot/logging/logback/base.xml"/>
+    <logger name="org.springframework.boot.context.config" level="trace"/>
     <root level="error">
         <appender-ref ref="CONSOLE"/>
     </root>
