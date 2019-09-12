@@ -63,7 +63,13 @@ public class FileController {
         return this.storageService.delete(id);
     }
 
+
     @GetMapping("{id}")
+    public FileItem get(@PathVariable String id) {
+        return this.storageService.getFileItem(id);
+    }
+
+    @GetMapping("download/{id}")
     public ResponseEntity<StreamingResponseBody> download(@PathVariable String id) {
         FileItem fileItem = this.storageService.getFileItem(id);
 
