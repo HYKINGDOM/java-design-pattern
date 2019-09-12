@@ -147,6 +147,7 @@ export default {
               times--;
               if (times < 0) {
                 phone.verifyCodeButtonDisabled = false;
+                phone.verifyCodeButton = "发送验证码";
                 return;
               }
               setTimeout(verifyCodeTimer, 1000);
