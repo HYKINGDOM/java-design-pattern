@@ -8,6 +8,7 @@
 <script>
 import axios from "axios";
 import { mapState } from "vuex";
+import loadUserInfo from "./LoadUserInfo";
 export default {
   data() {
     return {
@@ -20,22 +21,11 @@ export default {
       axios.post("/api/logout").then(response => {
         this.$router.replace("/login");
       });
-    },
-    loadUserInfo() {
-      axios.get("/api/user-center/user").then(response => {
-        let user = response.data;
-        if (user.name) {
-          this.$store.commit("updateAccount", response.data);
-        } else if (this.retry === false) {
-          this.retry = true;
-          this.loadUserInfo();
-        }
-      });
     }
   },
   mounted() {
     if (!this.User.name) {
-      this.loadUserInfo();
+      loadUserInfo(this.$store);
     }
   },
   computed: {
