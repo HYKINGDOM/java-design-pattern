@@ -45,6 +45,11 @@ export default [
                 name: '我的文件',
                 component: (resolve) => require(['@/components/user/File.vue'], resolve)
             },
+            {
+                path: 'sign-in',
+                name: '签到',
+                component: (resolve) => require(['@/components/user/SignIn.vue'], resolve)
+            },
         ]
     }
 ]

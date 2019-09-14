@@ -33,6 +33,11 @@ export default [
                 title: "我的文件",
                 icon: "icon-file",
                 key: "/user/file"
+            },
+            {
+                title: "签到",
+                icon: "icon-check",
+                key: "/user/sign-in"
             }
         ]
     }
