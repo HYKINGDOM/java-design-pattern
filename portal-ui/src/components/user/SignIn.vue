@@ -37,6 +37,18 @@ export default {
     },
     signIn() {
       // 执行签到
+      let url = "/api/daily-sign-in/sign";
+      let data = {
+        type: "ON_DUTY"
+      };
+      axios.post(url, data).then(response => {
+        let result = response.data;
+        if (result.code === 1) {
+          // 签到成功
+        } else {
+          // 签到失败
+        }
+      });
     }
   }
 };
