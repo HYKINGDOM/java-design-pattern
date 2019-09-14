@@ -13,6 +13,7 @@
     "axios": "^0.19.0",
     "hey-global": "^1.0.0",
     "heyui": "^1.24.2",
+    "moment": "^2.24.0",
     "vue": "^2.5.2",
     "vue-calendar-component": "^2.8.2",
     "vue-router": "^3.0.1",
