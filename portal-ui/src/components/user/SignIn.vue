@@ -4,13 +4,20 @@
     <div class="text-right sign-in-div">
       <Button :disabled="todayIsSignIn" color="blue" @click="signIn">{{signIngText}}</Button>
     </div>
-    <Calendar @changeMonth="changeMonth" :markDateMore="today" :markDate="signInDays"></Calendar>
+    <Calendar
+      ref="Calendar"
+      @changeMonth="changeMonth"
+      :markDateMore="today"
+      :markDate="signInDays"
+    ></Calendar>
   </div>
 </template>
 
 <script>
 import axios from "axios";
 import Calendar from "vue-calendar-component";
+// npm install moment
+var moment = require("moment");
 export default {
   components: { Calendar },
   data() {
@@ -27,13 +34,17 @@ export default {
       ],
       // markDate 选中之后使用默认颜色，标记哪天选中
       // 已经签到的记录，也需要从数据库取出来，并且返回Date部分即可，不需要时分秒。
-      signInDays: ["2019-09-01", "2019/09/02", "2019/9/3"]
+      signInDays: []
     };
+  },
+  mounted() {
+    this.loadData();
   },
   methods: {
     // date 是当前选中月份的当前天
     changeMonth(date) {
-      console.log(date);
+      //console.log(date);
+      this.loadData(date);
     },
     signIn() {
       // 执行签到
@@ -45,8 +56,35 @@ export default {
         let result = response.data;
         if (result.code === 1) {
           // 签到成功
+          this.$Message({ type: "success", text: "签到成功" });
+          let current = new Date();
+          let today = moment(current).format("YYYY-MM-DD");
+          this.$refs.Calendar.ChoseMonth(today);
+          //this.loadData();
         } else {
           // 签到失败
+          this.$Message({ type: "error", text: result.message });
+        }
+      });
+    },
+    loadData(date) {
+      let data = {
+        date: date,
+        type: "ON_DUTY"
+      };
+      axios.get("/api/daily-sign-in/sign", { params: data }).then(response => {
+        this.signInDays = response.data;
+        let current = new Date();
+        // npm install moment
+        let today = moment(current).format("YYYY-MM-DD");
+        let month = moment(current).format("YYYY-MM");
+        let isSignIned = this.signInDays.some(day => {
+          if (day.startsWith(month)) {
+            return day === today;
+          }
+        });
+        if (isSignIned) {
+          this.todayIsSignIn = true;
         }
       });
     }

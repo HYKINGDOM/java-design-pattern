@@ -1,16 +1,21 @@
 package org.fkjava.daily.sign.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.fkjava.commons.converter.DateToStringConverter;
+import org.fkjava.commons.converter.StringToDateTimePropertyEditor;
 import org.fkjava.commons.domain.Result;
 import org.fkjava.daily.sign.domain.DailySignIn;
 import org.fkjava.daily.sign.repository.DailySignInRepository;
 import org.fkjava.event.domain.SignInEvent;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 
 import java.util.Calendar;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -86,5 +91,51 @@ public class SignInServiceImpl implements SignInService {
         } else {
             return Result.error("今天已经签到");
         }
+    }
+
+    @Override
+    public List<String> getSignInDays(String t, String userId, String d) {
+        DailySignIn.Type type = DailySignIn.Type.valueOf(t);
+        Date date = new Date();
+        if (!StringUtils.isEmpty(d)) {
+            // yyyy/MM/dd
+            StringToDateTimePropertyEditor editor = new StringToDateTimePropertyEditor();
+            date = editor.convert(d);
+        }
+        // 计算开始时间：1号所在周的第一天
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        // 往前推一个星期
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) - 7);
+        Date startTime = calendar.getTime();
+
+
+        // 下一个月的第一天
+        calendar = Calendar.getInstance();
+        calendar.setTime(date);
+        calendar.set(Calendar.DAY_OF_MONTH, 1);
+        calendar.set(Calendar.MONTH, calendar.get(Calendar.MONTH) + 1);
+        calendar.set(Calendar.HOUR_OF_DAY, 0);
+        calendar.set(Calendar.MINUTE, 0);
+        calendar.set(Calendar.SECOND, 0);
+        calendar.set(Calendar.MILLISECOND, 0);
+        // 往后推迟一个星期
+        calendar.set(Calendar.DAY_OF_MONTH, calendar.get(Calendar.DAY_OF_MONTH) + 7);
+        Date endTime = calendar.getTime();
+
+        List<DailySignIn> signIns = this.dailySignInRepository
+                .findByUserIdAndTypeAndSignInTimeBetween(userId, type, startTime, endTime);
+
+        DateToStringConverter converter = new DateToStringConverter();
+        return signIns.stream().map(dsi -> converter.convert(dsi.getSignInTime()))
+                // 排序
+//                .sorted((v1, v2)->v1.compareTo(v2))
+                .sorted(Comparator.naturalOrder())
+                .collect(Collectors.toList());
     }
 }

@@ -35,7 +35,7 @@ public class DailySignIn {
     // 签到类型
     // 默认枚举存储ORDINAL（索引），如果枚举发生变化，索引就不那么准确
     // 存储String则是存储枚举的常量名，不管枚举如何变化，结果都是可靠的
-    @Enumerated(EnumType.ORDINAL)
+    @Enumerated(EnumType.STRING)
     private Type type = Type.ON_DUTY;
 
     public static enum Type {
