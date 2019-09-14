@@ -4,7 +4,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.fkjava.commons.domain.Result;
 import org.fkjava.daily.sign.domain.DailySignIn;
 import org.fkjava.daily.sign.repository.DailySignInRepository;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.fkjava.event.domain.SignInEvent;
+import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Calendar;
@@ -16,9 +17,14 @@ import java.util.List;
 public class SignInServiceImpl implements SignInService {
 
     private final DailySignInRepository dailySignInRepository;
+    private final RedisTemplate<Object, Object> redisTemplate;
 
-    public SignInServiceImpl(DailySignInRepository dailySignInRepository) {
+    public SignInServiceImpl(
+            DailySignInRepository dailySignInRepository,
+            RedisTemplate<Object, Object> redisTemplate
+    ) {
         this.dailySignInRepository = dailySignInRepository;
+        this.redisTemplate = redisTemplate;
     }
 
     @Override
@@ -65,6 +71,17 @@ public class SignInServiceImpl implements SignInService {
 
             signIn.setTimes(times);
             this.dailySignInRepository.save(signIn);
+
+//            SignInEvent event = new SignInEvent();
+//            event.setTime(signIn.getSignInTime());
+//            event.setTimes(signIn.getTimes());
+//            event.setType(signIn.getType().name());
+//            event.setUserId(signIn.getUserId());
+
+            // Date time, String userId, int times, String type
+            SignInEvent event = new SignInEvent(signIn.getSignInTime(), userId, times, signIn.getType().name());
+
+            this.redisTemplate.convertAndSend("event_daily_sign_in", event);
             return Result.ok();
         } else {
             return Result.error("今天已经签到");
