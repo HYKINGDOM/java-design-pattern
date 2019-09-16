@@ -1,0 +1,22 @@
+# 修改端口号
+server:
+  port: 8761
+# 由于当前服务是单体的注册中心，所以不要把自己注册到注册到注册中心里面
+# 不要注册自己
+eureka:
+  instance:
+    prefer-ip-address: true
+  client:
+    # 把自己也注册为一个服务
+    registerWithEureka: false
+    # 抓取远程的注册表信息
+    fetchRegistry: false
+    serviceUrl:
+      # 分区中有多少个主机
+      defaultZone: http://127.0.0.1:8761/eureka
+spring:
+  application:
+    name: registry-center
+logging:
+  level:
+    root: error

@@ -46,7 +46,9 @@ public class SecurityConfig {
                         properties.getApiPath() + "/oauth-server/wechat/oauth2/authorization",
                         properties.getApiPath() + "/oauth-server/wechat/login/oauth2/code/**",
                         properties.getApiPath() + "/oauth-server/wechat/login/**",
-                        properties.getApiPath() + "/we-chat/receiver"
+                        properties.getApiPath() + "/we-chat/receiver",
+                        properties.getApiPath() + "/*/actuator/**",
+                        "/actuator/**"
                 )
                 .permitAll();
         // 其他路径都需要授权

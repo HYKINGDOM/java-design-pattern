@@ -73,10 +73,17 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
     </dependencies>
 
 
     <build>
+        <!--最终编译的文件名，会自动加上packaging作为后缀，默认加上.jar-->
+        <finalName>${project.artifactId}</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
@@ -84,6 +91,32 @@
                 <configuration>
                     <fork>true</fork>
                     <jmxPort>30011</jmxPort>
+                </configuration>
+            </plugin>
+
+            <!-- Docker的镜像构建插件 -->
+            <plugin>
+                <groupId>io.fabric8</groupId>
+                <artifactId>docker-maven-plugin</artifactId>
+                <version>0.30.0</version>
+                <configuration>
+                    <!-- 可以指定生成多个镜像，比如不同的模块 -->
+                    <images>
+                        <image>
+                            <!-- 指定镜像的tag名称 -->
+                            <!-- app3:1.0-SNAPSHOT -->
+                            <name>${project.build.finalName}:${project.version}</name>
+                            <build>
+                                <!-- 指定Docker的配置文件路径 -->
+                                <contextDir>${project.basedir}/src/main/docker</contextDir>
+                                <assembly>
+                                    <!-- 使用什么样的方式复制文件 -->
+                                    <!-- artifact表示复制mvn package构建出来的jar文件 -->
+                                    <descriptorRef>artifact</descriptorRef>
+                                </assembly>
+                            </build>
+                        </image>
+                    </images>
                 </configuration>
             </plugin>
         </plugins>

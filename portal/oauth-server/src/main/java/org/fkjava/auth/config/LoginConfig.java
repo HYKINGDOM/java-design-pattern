@@ -99,6 +99,7 @@ public class LoginConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers(
                         "/wechat/oauth2/authorization/**",
 //                        "/wechat/login/wechat",

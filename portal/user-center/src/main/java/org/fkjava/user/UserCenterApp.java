@@ -42,6 +42,7 @@ public class UserCenterApp
     public void configure(HttpSecurity http) throws Exception {
         // 继承OAuth2ResourceConfig的目的就是为了把不需要授权的URL排除掉
         http.authorizeRequests()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers(
                         "/user/byLoginName",
                         "/user/byOpenId",
