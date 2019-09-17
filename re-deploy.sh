@@ -65,6 +65,7 @@ docker run \
 	-d \
 	mysql:8.0.17
 
+sleep 5
 # 导入测试数据，需要MySQL客户端
 mysql -h127.0.0.1 -uroot -p1234 < cloud.sql
 
