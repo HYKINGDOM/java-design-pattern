@@ -102,6 +102,7 @@ echo "所有服务的服务实例启动成功"
 ########### 构建前端程序
 # 构建程序
 cd "${ROOT}/portal-ui"
+npm install
 npm run build
 
 # 复制构建后的文件到Nginx的目录中，用于后面的部署
