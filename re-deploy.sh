@@ -1,5 +1,8 @@
 #!/bin/bash
 
+sudo mkdir /data
+sudo chown $USER:root /data
+
 ########### 创建网络
 docker network create micro-services
 
@@ -62,6 +65,7 @@ services=("registry-center" "config-center" "user-center" "verify-code" "oauth-s
 version="1.0-SNAPSHOT"
 
 echo "本程序用于构建所有服务的镜像，首先会先在本地Maven仓库安装所有程序，然后把构建的镜像放在本地Docker容器里面。"
+cd "${ROOT}/portal" || exit
 mvn install
 
 for service in ${services[@]}; do
