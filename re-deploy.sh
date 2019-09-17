@@ -8,6 +8,8 @@ docker network create micro-services
 
 ########### 配置和运行Redis
 # 数据存储目录
+docker stop redis
+docker rm redis
 sudo rm -rf /data/docker/redis
 mkdir -p /data/docker/redis
 
@@ -31,6 +33,8 @@ docker run --restart always  \
 
 ########### 配置和运行MySQL
 # 创建数据存储目录
+docker stop mysql
+docker rm mysql
 sudo rm -rf /data/docker/mysql
 mkdir -p /data/docker/mysql/conf.d
 mkdir -p /data/docker/mysql/data
@@ -71,6 +75,7 @@ mvn install
 for service in ${services[@]}; do
     echo "构建${service}服务的镜像"
     docker stop ${service}
+    docker rm ${service}
     cd "${ROOT}/portal/${service}" || exit
     mvn docker:build
 done
@@ -80,8 +85,6 @@ done
 echo "如果已经把镜像构建放入Docker容器中，则可以使用此脚本在容器中启动一个实例，实例的名称跟服务名称相同。"
 for service in ${services[@]}; do
     echo "启动${service}服务"
-    docker stop ${service}
-    docker rm ${service}
     docker run --network micro-services --name ${service} --network-alias ${service} \
         -P \
         -d ${service}:${version}
@@ -96,12 +99,15 @@ cd "${ROOT}/portal-ui"
 npm run build
 
 # 复制构建后的文件到Nginx的目录中，用于后面的部署
+docker stop nginx
+docker rm nginx
+
+sudo rm -rf /data/docker/nginx
 mkdir -p /data/docker/nginx/web/default
 cp -a ./dist/* /data/docker/nginx/web/default/
 
 
 ########### 配置和运行Nginx
-sudo rm -rf /data/docker/nginx
 mkdir -p /data/docker/nginx/conf.d
 mkdir -p /data/docker/nginx/logs
 echo -e "server {
@@ -127,8 +133,6 @@ echo -e "server {
     > /data/docker/nginx/conf.d/default.conf
 
 # 重新配置基于Docker运行的Nginx
-docker stop nginx
-docker rm nginx
 
 docker run --name nginx \
     -v /data/docker/nginx/conf.d:/etc/nginx/conf.d \
