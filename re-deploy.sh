@@ -55,7 +55,6 @@ docker run \
 	mysql:8.0.17
 
 ROOT=${PWD}
-cd ${ROOT}/portal
 ########### 创建Docker镜像
 services=("registry-center" "config-center" "user-center" "verify-code" "oauth-server" "storage" "we-chat" "content" "daily-sign-in" "monitor" "api-gateway")
 version="1.0-SNAPSHOT"
@@ -66,9 +65,8 @@ mvn install
 for service in ${services[@]}; do
     echo "构建${service}服务的镜像"
     docker stop ${service}
-    cd "${service}" || exit
+    cd "${ROOT}/portal/${service}" || exit
     mvn docker:build
-    cd ${ROOT}/portal || exit
 done
 
 
@@ -88,6 +86,7 @@ echo "所有服务的服务实例启动成功"
 
 ########### 构建前端程序
 # 构建程序
+cd "${ROOT}/portal-ui"
 npm run build
 
 # 复制构建后的文件到Nginx的目录中，用于后面的部署
