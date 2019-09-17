@@ -29,7 +29,7 @@ docker run --restart always  \
 	-v "/data/docker/redis":/data \
 	--network-alias redis \
 	--network micro-services \
-	-p 6379:6379 
+	-p 6379:6379 \
 	-d redis redis-server /data/redis.conf
 
 ########### 配置和运行MySQL
@@ -64,6 +64,9 @@ docker run \
 	--restart always \
 	-d \
 	mysql:8.0.17
+
+# 导入测试数据，需要MySQL客户端
+mysql -uroot -p1234 < cloud.sql
 
 ROOT=${PWD}
 ########### 创建Docker镜像
