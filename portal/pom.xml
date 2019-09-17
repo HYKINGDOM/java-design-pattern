@@ -24,6 +24,8 @@
         <module>user-center-domain</module>
         <module>we-chat</module>
         <module>content</module>
+        <module>daily-sign-in</module>
+        <module>event-domain</module>
     </modules>
     <packaging>pom</packaging>
 
