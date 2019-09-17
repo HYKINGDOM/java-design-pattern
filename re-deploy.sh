@@ -54,7 +54,7 @@ default-time-zone='+8:00'
 # -e MYSQL_ROOT_PASSWORD=1234用于设置root用户的密码，此密码可以在登录后修改
 docker run \
 	--network micro-services \
-	--name mysql-server \
+	--name mysql \
 	--network-alias mysql-server \
 	-e MYSQL_ROOT_PASSWORD=1234 \
 	-v /data/docker/mysql/conf.d:/etc/mysql/conf.d \
