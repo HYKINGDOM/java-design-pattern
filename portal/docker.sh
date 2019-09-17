@@ -52,9 +52,7 @@ start() {
       break
     fi
     echo "启动${service}服务"
-    docker start ${service} \
-    -P \
-    -d ${service}
+    docker start ${service} 
   done
   unset i
   echo "所有服务的服务实例启动成功"
@@ -68,9 +66,7 @@ stop() {
       break
     fi
     echo "停止${service}服务"
-    docker stop ${service} \
-    -P \
-    -d ${service}
+    docker stop ${service} 
   done
   unset i
   echo "所有服务的服务实例停止成功"

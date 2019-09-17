@@ -65,15 +65,15 @@ default-time-zone='+8:00'
 在服务启动以后，导入测试数据到MySQL，登录名是13800138000，密码是1234
 
 ```mysql
-INSERT INTO `user` VALUES 
+INSERT INTO `user` (id, account_expire_time, account_non_locked, enabled, login_name,name, open_id,  password, password_expire_time,phone, registered_time,  tenant_id) VALUES 
 	('678bf851-786c-40e4-9f82-e7bb40e9002d','2020-02-29 14:01:24.704000'
-     ,_binary '',_binary '','13800138000','疯狂软件',
+     ,b'1',b'1','13800138000','疯狂软件',
      'oVfatuAD7ifHGACn5ClJ-9bkFRbM',
      '{bcrypt}$2a$10$t7bhcHuMss4D8DguTAMb7.WGywBn5eVV545EMgTrurkhSYl4atQli',
      '2019-12-01 14:01:24.704000','13800138000','2019-09-02 14:01:24.694000',NULL);
 
 INSERT INTO `user_info` VALUES 
-	('4901a5b0-8caf-47a0-9d29-481983074ee0','gh_f21f1485101e','广州','中国',_binary '',103,
+	('4901a5b0-8caf-47a0-9d29-481983074ee0','gh_f21f1485101e','广州','中国',b'1',103,
      'http://thirdwx.qlogo.cn/mmopen/MicSgeq41SN9APr4clu4j00USgtLh3vHX4c1pPfVElhgPpVagx6nWPLYXMticQicXUM8NuiaDhHSgWhg3Itv7ma9XHgRibtYtcMDa/132',
      'zh_CN','疯狂软件','oVfatuAD7ifHGACn5ClJ-9bkFRbM','广东','0','','',1,1,'2019-08-26 11:50:41.000000',
      'ADD_SCENE_QR_CODE',1566791441,NULL,'678bf851-786c-40e4-9f82-e7bb40e9002d');

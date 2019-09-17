@@ -2,12 +2,15 @@ package org.fkjava.gateway.config;
 
 import lombok.extern.slf4j.Slf4j;
 import org.fkjava.commons.config.CommonConfigProperties;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.server.reactive.ServerHttpRequest;
 import org.springframework.security.config.annotation.web.reactive.EnableWebFluxSecurity;
 import org.springframework.security.config.web.server.ServerHttpSecurity;
+import org.springframework.security.oauth2.client.registration.ReactiveClientRegistrationRepository;
+import org.springframework.security.oauth2.client.web.server.ServerOAuth2AuthorizationCodeAuthenticationTokenConverter;
 import org.springframework.security.web.server.SecurityWebFilterChain;
 import org.springframework.security.web.server.authentication.logout.RedirectServerLogoutSuccessHandler;
 import org.springframework.web.server.WebFilter;
@@ -23,6 +26,8 @@ import static org.springframework.cloud.gateway.support.ServerWebExchangeUtils.G
 public class SecurityConfig {
 
     private final CommonConfigProperties properties;
+    @Autowired
+    private ReactiveClientRegistrationRepository clientRegistrationRepository;
 
     public SecurityConfig(CommonConfigProperties properties) {
         this.properties = properties;
@@ -54,7 +59,8 @@ public class SecurityConfig {
         // 其他路径都需要授权
         http.authorizeExchange().anyExchange().authenticated();
         // 激活OAuth 2.0的登录
-        http.oauth2Login();
+        http.oauth2Login()
+                .authenticationConverter(this.serverOAuth2AuthorizationCodeAuthenticationTokenConverter());
         // 退出登录
         RedirectServerLogoutSuccessHandler redirectServerLogoutSuccessHandler
                 = new RedirectServerLogoutSuccessHandler();
@@ -90,5 +96,11 @@ public class SecurityConfig {
                 return chain.filter(exchange);
             }
         };
+    }
+
+    private ServerOAuth2AuthorizationCodeAuthenticationTokenConverter serverOAuth2AuthorizationCodeAuthenticationTokenConverter() {
+        ServerOAuth2AuthorizationCodeAuthenticationTokenConverter converter
+                = new org.fkjava.gateway.oauth2.ServerOAuth2AuthorizationCodeAuthenticationTokenConverter(clientRegistrationRepository);
+        return converter;
     }
 }
