@@ -29,6 +29,7 @@ docker run --restart always  \
 	-v "/data/docker/redis":/data \
 	--network-alias redis \
 	--network micro-services \
+	-p 6379:6379 
 	-d redis redis-server /data/redis.conf
 
 ########### 配置和运行MySQL
@@ -59,6 +60,7 @@ docker run \
 	-e MYSQL_ROOT_PASSWORD=1234 \
 	-v /data/docker/mysql/conf.d:/etc/mysql/conf.d \
 	-v /data/docker/mysql/data:/var/lib/mysql \
+	-p 3306:3306 \
 	--restart always \
 	-d \
 	mysql:8.0.17
