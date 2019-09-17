@@ -66,7 +66,7 @@ docker run \
 	mysql:8.0.17
 
 # 导入测试数据，需要MySQL客户端
-mysql -uroot -p1234 < cloud.sql
+mysql -h127.0.0.1 -uroot -p1234 < cloud.sql
 
 ROOT=${PWD}
 ########### 创建Docker镜像
