@@ -5,6 +5,7 @@ docker network create micro-services
 
 ########### 配置和运行Redis
 # 数据存储目录
+sudo rm -rf /data/docker/redis
 mkdir -p /data/docker/redis
 
 # 生成配置文件
@@ -27,6 +28,7 @@ docker run --restart always  \
 
 ########### 配置和运行MySQL
 # 创建数据存储目录
+sudo rm -rf /data/docker/mysql
 mkdir -p /data/docker/mysql/conf.d
 mkdir -p /data/docker/mysql/data
 
@@ -95,6 +97,7 @@ cp -a ./dist/* /data/docker/nginx/web/default/
 
 
 ########### 配置和运行Nginx
+sudo rm -rf /data/docker/nginx
 mkdir -p /data/docker/nginx/conf.d
 mkdir -p /data/docker/nginx/logs
 echo -e "server {
