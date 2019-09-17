@@ -142,9 +142,11 @@ echo -e "server {
 # 重新配置基于Docker运行的Nginx
 
 docker run --name nginx \
+	--network micro-services \
     -v /data/docker/nginx/conf.d:/etc/nginx/conf.d \
     -v /data/docker/nginx/web/default/:/web/default/:ro \
     -v /data/docker/nginx/logs:/var/log/nginx \
+    -p 80:80 \
     -d nginx
 
 
