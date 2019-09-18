@@ -43,7 +43,7 @@ sudo ln -s jdk-11.0.2 jdk
 
 # 配置JAVA_HOME和PATH环境变量
 sudo bash
-echo "JAVA_HOME=/usr/local/jdk" > /etc/profile.d/jdk.sh
+echo "export JAVA_HOME=/usr/local/jdk" > /etc/profile.d/jdk.sh
 echo "PATH=\$JAVA_HOME/bin:\$PATH" >> /etc/profile.d/jdk.sh
 exit
 
@@ -58,7 +58,7 @@ sudo chmod 777 /data/maven_repository
 
 if [ ! -f "apache-maven-3.6.2" ]; then
     echo "正在下载Maven..."
-    #wget http://mirrors.shu.edu.cn/apache/maven/maven-3/3.6.0/binaries/apache-maven-3.6.0-bin.tar.gz
+    #wget http://mirrors.shu.edu.cn/apache/maven/maven-3/3.6.0/binaries/apache-maven-3.6.2-bin.tar.gz
     # 在清华的镜像下载文件
     wget --connect-timeout 10 -t 1 http://mirrors.tuna.tsinghua.edu.cn/apache/maven/maven-3/3.6.2/binaries/apache-maven-3.6.2-bin.tar.gz
     DOWNLOAD_STATUS=$?
@@ -68,41 +68,41 @@ if [ ! -f "apache-maven-3.6.2" ]; then
     fi
     echo "Maven下载成功."
 fi
-if [ -e "apache-maven-3.6.0" ]; then
-    rm -rf apache-maven-3.6.0
+if [ -e "apache-maven-3.6.2" ]; then
+    rm -rf apache-maven-3.6.2
 fi
-tar -zxf apache-maven-3.6.0-bin.tar.gz
+tar -zxf apache-maven-3.6.2-bin.tar.gz
 
 # 配置Maven从阿里云的镜像下载jar文件
-echo '<?xml version="1.0" encoding="UTF-8"?>' > apache-maven-3.6.0/conf/settings.xml
-echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"' >> apache-maven-3.6.0/conf/settings.xml
-echo '          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' >> apache-maven-3.6.0/conf/settings.xml
-echo '          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">' >> apache-maven-3.6.0/conf/settings.xml
-#    echo "    <localRepository>$SCRIPT_DIR/maven_repository</localRepository>" >> apache-maven-3.6.0/conf/settings.xml
-echo "    <localRepository>/data/maven_repository</localRepository>" >> apache-maven-3.6.0/conf/settings.xml
-echo '    <pluginGroups>' >> apache-maven-3.6.0/conf/settings.xml
-echo '    </pluginGroups>' >> apache-maven-3.6.0/conf/settings.xml
-echo '    <proxies>' >> apache-maven-3.6.0/conf/settings.xml
-echo '    </proxies>' >> apache-maven-3.6.0/conf/settings.xml
-echo '    <servers>' >> apache-maven-3.6.0/conf/settings.xml
-echo '    </servers>' >> apache-maven-3.6.0/conf/settings.xml
-echo '    <mirrors>' >> apache-maven-3.6.0/conf/settings.xml
-echo '        <mirror>' >> apache-maven-3.6.0/conf/settings.xml
-echo '            <id>all</id>' >> apache-maven-3.6.0/conf/settings.xml
-echo '            <mirrorOf>*</mirrorOf>' >> apache-maven-3.6.0/conf/settings.xml
-echo '            <url>https://maven.aliyun.com/repository/central</url>' >> apache-maven-3.6.0/conf/settings.xml
-echo '        </mirror>' >> apache-maven-3.6.0/conf/settings.xml
-echo '    </mirrors>' >> apache-maven-3.6.0/conf/settings.xml
-echo '    <profiles>' >> apache-maven-3.6.0/conf/settings.xml
-echo '    </profiles>' >> apache-maven-3.6.0/conf/settings.xml
-echo '</settings>' >> apache-maven-3.6.0/conf/settings.xml
+echo '<?xml version="1.0" encoding="UTF-8"?>' > apache-maven-3.6.2/conf/settings.xml
+echo '<settings xmlns="http://maven.apache.org/SETTINGS/1.0.0"' >> apache-maven-3.6.2/conf/settings.xml
+echo '          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"' >> apache-maven-3.6.2/conf/settings.xml
+echo '          xsi:schemaLocation="http://maven.apache.org/SETTINGS/1.0.0 http://maven.apache.org/xsd/settings-1.0.0.xsd">' >> apache-maven-3.6.2/conf/settings.xml
+#    echo "    <localRepository>$SCRIPT_DIR/maven_repository</localRepository>" >> apache-maven-3.6.2/conf/settings.xml
+echo "    <localRepository>/data/maven_repository</localRepository>" >> apache-maven-3.6.2/conf/settings.xml
+echo '    <pluginGroups>' >> apache-maven-3.6.2/conf/settings.xml
+echo '    </pluginGroups>' >> apache-maven-3.6.2/conf/settings.xml
+echo '    <proxies>' >> apache-maven-3.6.2/conf/settings.xml
+echo '    </proxies>' >> apache-maven-3.6.2/conf/settings.xml
+echo '    <servers>' >> apache-maven-3.6.2/conf/settings.xml
+echo '    </servers>' >> apache-maven-3.6.2/conf/settings.xml
+echo '    <mirrors>' >> apache-maven-3.6.2/conf/settings.xml
+echo '        <mirror>' >> apache-maven-3.6.2/conf/settings.xml
+echo '            <id>all</id>' >> apache-maven-3.6.2/conf/settings.xml
+echo '            <mirrorOf>*</mirrorOf>' >> apache-maven-3.6.2/conf/settings.xml
+echo '            <url>https://maven.aliyun.com/repository/central</url>' >> apache-maven-3.6.2/conf/settings.xml
+echo '        </mirror>' >> apache-maven-3.6.2/conf/settings.xml
+echo '    </mirrors>' >> apache-maven-3.6.2/conf/settings.xml
+echo '    <profiles>' >> apache-maven-3.6.2/conf/settings.xml
+echo '    </profiles>' >> apache-maven-3.6.2/conf/settings.xml
+echo '</settings>' >> apache-maven-3.6.2/conf/settings.xml
 
 mkdir ~/.m2
-cp apache-maven-3.6.0/conf/settings.xml ~/.m2/
+cp apache-maven-3.6.2/conf/settings.xml ~/.m2/
 
 # 配置Maven的环境变量，把mvn命令的路径加入PATH环境变量中
 sudo bash
-echo "M2_HOME=$SCRIPT_DIR/apache-maven-3.6.0" > /etc/profile.d/maven.sh
+echo "M2_HOME=$SCRIPT_DIR/apache-maven-3.6.2" > /etc/profile.d/maven.sh
 echo "PATH=\$M2_HOME/bin:\$PATH" >> /etc/profile.d/maven.sh
 exit
 source /etc/profile.d/maven.sh
@@ -136,7 +136,7 @@ docker run --restart always  \
 	--network micro-services \
 	--name redis \
 	--network-alias redis \
-	-p 6379:6379 
+	-p 6379:6379 \
 	-d \
 	redis
 ```
@@ -163,6 +163,7 @@ docker run --restart always  \
 	-v "/data/docker/redis":/data \
 	--network-alias redis \
 	--network micro-services \
+	-p 6379:6379 \
 	-d redis redis-server /data/redis.conf
 ```
 
@@ -276,8 +277,8 @@ docker restart api-gateway
 
 ```shell
 # 构建程序
-npm run build
 npm install
+npm run build
 
 # 复制构建后的文件到Nginx的目录中，用于后面的部署
 mkdir -p /data/docker/nginx/web/default
@@ -321,6 +322,9 @@ docker run --name nginx \
     -v /data/docker/nginx/conf.d:/etc/nginx/conf.d \
     -v /data/docker/nginx/web/default/:/web/default/:ro \
     -v /data/docker/nginx/logs:/var/log/nginx \
+	--network micro-services \
+	--restart always \
+	-p 80:80 \
     -d nginx
 ```
 
