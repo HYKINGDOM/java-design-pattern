@@ -8,7 +8,7 @@ eureka:
     fetchRegistry: true
     serviceUrl:
       # 分区中有多少个主机
-      defaultZone: http://127.0.0.1:8761/eureka
+      defaultZone: http://registry-center:8761/eureka
   instance:
     prefer-ip-address: true
 spring:

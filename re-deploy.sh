@@ -100,7 +100,6 @@ for service in ${services[@]}; do
             java \
             -Dspring.profiles.active=dev,native \
             -Dspring.cloud.config.uri=http://config-center:20002 \
-            -Deureka.client.serviceUrl.defaultZone=http://registry-center:8761/eureka \
             -Dspring.datasource.url="jdbc:mysql://mysql-server:3306/cloud?useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true" \
             -jar ${service}.jar
     else
