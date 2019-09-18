@@ -16,7 +16,7 @@
 . /lib/lsb/init-functions
 
 # listing all services
-services=("registry-center" "config-center" "user-center" "verify-code" "oauth-server" "storage" "test" "we-chat" "api-gateway")
+services=("registry-center" "config-center" "user-center" "verify-code" "oauth-server" "storage" "test" "we-chat" "content" "daily-sign-in" "monitor" "api-gateway")
 
 start() {
   echo "重新构建并安装所有服务"

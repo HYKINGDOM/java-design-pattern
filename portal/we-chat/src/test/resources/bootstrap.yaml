@@ -1,5 +1,24 @@
+eureka:
+  client:
+    # 把自己也注册为一个服务
+    registerWithEureka: false
+    # 抓取远程的注册表信息
+    fetchRegistry: false
+    serviceUrl:
+      # 分区中有多少个主机
+      defaultZone: http://127.0.0.1:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
 fk:
-  host-prefix: http://120.79.98.89
+  host-prefix: http://127.0.0.1:8080
   api-path: /api
   api-prefix: ${fk.host-prefix}${fk.api-path}
   we-chat-login:
@@ -12,15 +31,23 @@ fk:
       app-id: wx375cd9c53c364fc4
       app-secret: ad91eb3762d1336c39a417173bc47aba
       token: fasdgfgerewewrgdsfsf
-    light_live:
-      name: 微程序
-      app-id: wxa5b1fb16151df1ff
-      app-secret: 3cd2f380d84f121dc6e1c3aa981aa8e3
-      token: mynameisluowenqiang
-      encoding-key: XL5JLVGME5cwECbUM6l8RtGLZn3EvBHBEbDkA4mGSql
+
+logging:
+  level:
+    root: ERROR
+    org:
+      fkjava: TRACE
+      hibernate:
+        SQL: TRACE
+        type:
+          descriptor:
+            sql:
+              BasicBinder: TRACE
+    com:
+      netflix: INFO
+server:
+  port: 20009
 spring:
-  application:
-    name: we-chat
   datasource:
     url: jdbc:mysql://127.0.0.1:3306/cloud?useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
     username: root
@@ -35,20 +62,5 @@ spring:
     # 每个数据库都有一个index来访问，没有名称！
     # 默认情况下，database的值是0~15。
     database: 0
-    # 基于哨兵的方式连接，需要指定master的id和所有的哨兵
-    #    sentinel:
-    #      master: master1
-    #      nodes: 192.168.43.19:26379,192.168.43.19:26380,192.168.43.19:26381
-    # 基于集群方式的访问
-    cluster:
-      nodes: 192.168.10.101:6379,192.168.10.102:6379,192.168.10.103:6379
-
-logging:
-  level:
-    org:
-      hibernate:
-        SQL: trace
-        type:
-          descriptor:
-            sql:
-              BasicBinder: trace
+    host: 127.0.0.1
+    port: 6379

@@ -1,7 +1,36 @@
+eureka:
+  client:
+    # 把自己也注册为一个服务
+    registerWithEureka: true
+    # 抓取远程的注册表信息
+    fetchRegistry: true
+    serviceUrl:
+      # 分区中有多少个主机
+      defaultZone: http://127.0.0.1:8761/eureka
+  instance:
+    prefer-ip-address: true
+
+hystrix:
+  command:
+    default:
+      execution:
+        isolation:
+          thread:
+            timeoutInMilliseconds: 10000
 fk:
   host-prefix: http://127.0.0.1:8080
   api-path: /api
   api-prefix: ${fk.host-prefix}${fk.api-path}
+  we-chat-login:
+    service-path: /oauth-server
+    login-processing-url: /wechat/login/oauth2/code/*
+    redirect-uri: "${fk.we-chat-login.service-path}/wechat/{action}/oauth2/code/{registrationId}"
+  we-chats:
+    gh_f21f1485101e:
+      name: 公众平台测试号
+      app-id: wx375cd9c53c364fc4
+      app-secret: ad91eb3762d1336c39a417173bc47aba
+      token: fasdgfgerewewrgdsfsf
 logging:
   level:
     root: ERROR
@@ -15,3 +44,9 @@ logging:
               BasicBinder: TRACE
     com:
       netflix: INFO
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,loggers
+        #include: "*"

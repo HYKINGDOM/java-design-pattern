@@ -2,6 +2,7 @@ package org.fkjava.auth.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.apache.commons.io.IOUtils;
 import org.fkjava.commons.config.CommonConfigProperties;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,13 +14,10 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import java.io.File;
 import java.io.IOException;
-import java.net.URISyntaxException;
 import java.net.URL;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Controller
@@ -51,7 +49,7 @@ public class LoginPageController {
     @RequestMapping
     @ResponseStatus(HttpStatus.UNAUTHORIZED)
     public ResponseEntity<String> noLoginHTML(HttpSession session, HttpServletRequest request)
-            throws URISyntaxException, IOException {
+            throws IOException {
         String sessionId = session.getId();
         String prefix = "";
         if (properties.getApiPrefix().endsWith(properties.getApiPath())) {
@@ -72,13 +70,17 @@ public class LoginPageController {
         }
 
         URL url = this.getClass().getResource("/static/user-center/login.html");
-        Path path = new File(url.toURI()).toPath();
-        String html = Files.readString(path);
+        List<String> lines = IOUtils.readLines(url.openStream());
+        StringBuilder builder = new StringBuilder();
+        for (String line : lines) {
+            builder.append(line);
+        }
+        String html = builder.toString();
         html = html.replace("{sessionId}", sessionId);
         html = html.replace("{prefix}", prefix);
         html = html.replace("{username}", username);
         html = html.replace("{error}", error);
-        ResponseEntity.BodyBuilder builder = ResponseEntity.status(HttpStatus.OK);
-        return builder.body(html);
+        ResponseEntity.BodyBuilder bodyBuilder = ResponseEntity.status(HttpStatus.OK);
+        return bodyBuilder.body(html);
     }
 }

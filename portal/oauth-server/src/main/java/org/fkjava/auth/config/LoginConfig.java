@@ -99,6 +99,7 @@ public class LoginConfig extends WebSecurityConfigurerAdapter {
 
         http
                 .authorizeRequests()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers(
                         "/wechat/oauth2/authorization/**",
 //                        "/wechat/login/wechat",
@@ -255,11 +256,10 @@ public class LoginConfig extends WebSecurityConfigurerAdapter {
                 String accept = request.getHeader("accept");
                 boolean isXhr = request.getHeader("XMLHttpRequest") != null;
                 response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                log.trace("登录失败，Accept： " + accept + "，是否AJAX请求: " + isXhr + "，失败原因：" + exception.getLocalizedMessage(), exception);
                 if (isXhr || !StringUtils.isEmpty(accept) && accept.toLowerCase().indexOf("application/json") == 0) {
-                    log.debug("登录失败，返回JSON");
-                    sendJson(2, "登录失败", request, response);
+                    sendJson(2, "登录失败: " + exception.getLocalizedMessage(), request, response);
                 } else {
-                    log.debug("登录失败，默认返回");
                     super.onAuthenticationFailure(request, response, exception);
                 }
             }

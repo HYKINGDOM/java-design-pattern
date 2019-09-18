@@ -40,6 +40,7 @@ public class WeChatApp extends OAuth2ResourceConfig {
 //        super.configure(http);
 //        http.oauth2ResourceServer().jwt();
         http.authorizeRequests()
+                .antMatchers("/actuator/**").permitAll()
                 .antMatchers(
                         "/**/*.png",
                         "/receiver"

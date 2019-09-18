@@ -1,0 +1,68 @@
+server:
+  port: 20002
+eureka:
+  client:
+    # 把自己也注册为一个服务
+    registerWithEureka: true
+    # 抓取远程的注册表信息
+    fetchRegistry: true
+    serviceUrl:
+      # 分区中有多少个主机
+      defaultZone: http://registry-center:8761/eureka
+  instance:
+    prefer-ip-address: true
+spring:
+  application:
+    name: config-server
+  cloud:
+    config:
+      server:
+        git:
+#          uri: https://gitee.com/luo_wenqiang/config
+#          username: 自己写个用户名
+#          password: 自己写个密码
+
+          # 下面是基于SSH协议的密钥来进行登录的，需要使用ssh-keygen命令生成密钥对
+          # ssh-keygen -t rsa
+          # 会得到两个文件：
+          # 私钥（id_rsa），就是下面的内容
+          # 公钥（id_rsa.pu），放到Git服务器里面，一般可以针对仓库进行设置
+          uri: git@gitee.com:luo_wenqiang/config.git
+          #host-key-algorithm: ssh-rsa
+          # 私钥的解密密码
+          passphrase: Fkjava
+          private-key: |
+            -----BEGIN RSA PRIVATE KEY-----
+            Proc-Type: 4,ENCRYPTED
+            DEK-Info: AES-128-CBC,126BE1E89DC217F27603CB8141B8DE8C
+
+            PDkaAKEMsz678hKomw1g3d21EkdIKzxSuoe3nXsuYVHScMvJvc1QqALxFchsUdkm
+            bAkVFQgfXHbqAzXkHdK4UaAnIPUh6x+okIB6azRf7q+U/0Ooa9Aca15DA4RjJbt3
+            t7ZL1ZRjLHEJxRAZZXnBTT12sZjk/UqLXi4gWhhYJ+mj0I138gchqsZzLsJ4tKPp
+            mYm9xNKJwCpnN3R8EFwuZZpSeu2mdKxglkQf+JZ56X/1kWvgP0sjwbVDm5eyFelP
+            ktrMRq/jfDyHxeNBCeCioUUyRcTUD2rRHTu70nwDBo+FZzlt8qhALE5PNoznQ3cD
+            Xhcu8devPxxBh1m+VVR7BDalGNOD7tSwoljb2kC/FyJPqxpt2F4Sv5rwJDOR1N+6
+            ZAy4tAVYxzwml1l728rS7iTWzfTN98A5JRuF3arHwXIGX9blK1akP33kJh3jDnRg
+            egamTfEEeL0v+3L6e48V+OwjRPixyHg35MBMlJTRbl3MU8nnFrx7pRhC+Sy0p5tt
+            3j39Alxubd+Kvy/fKKp3CmvaUGHi9qln/kmSdno+0VMF0J5DG/EkrQeo3wrM/I7N
+            auOm+G7TSNzCJEo6AJts+F3oyyClqQjCNINj3l98rvzWBY7o5rKr9190i7xGy2Xv
+            tSbM3xqhYYLGuQaMHU0lIyAV1vty2rBB/3F7KP4xEj/Xpwr0aSxABNxfHQq9D7zL
+            VRSexYW9ZuYJO70o/i4vOxHte1fNeM2P9KUptqJo38HEI5EZGMZ2fiBQRGCF2JzB
+            ws8nA9lo2zdnJgYcZo3ovXNzSsPb2eA2oTtI3xH65pjwcx50PX8XN9IiIPI7MJ4c
+            v4637g4NQYZA/WbjxV2/vZVhlq+C1Si+R/j70XAFsh/GN299Y1jNhLxEgx63wXmf
+            kmhWFl+MsjI0qciTYtkDh7a+UFI8d4pRho7OlVZDV3OQVu3+L4MGQcJyp76kB2IY
+            lCb94JvZdPYWtlFplDxuD7W93M/2uhBTwj0+c6+/MHexVd3Zae8JKVBKr3ZgPsps
+            lfjerZGHZmhc4uqiW2lXn2+l0fRAPmw8LWe2tRsdy5xfWnDM5odNxFckxDsZjhWP
+            Qw+q0hUlb5OpCyAvjtDzcPDlXsGhNDLxFGR0lri9jrkSdne3Ya4JR2tWiyqHc7PH
+            g2CS7jLfdII1R4XZC24haLS0r8HS3wEABZ58zP9tT5ehTzkxaBLU/lqo02i0sEWR
+            Fhec8uk4LgRmRFukcz6jX/vI7McjfinmzrH6/ZDw2XrOEglLGl2i/831VqizVP5H
+            rFlwUZWHagd/rvjnAoxAfRYqtAUcPi94epOvBZmcov0PWSJaNKpvw+KERGVBRn1T
+            wwc57DzKDuJ4SB8MGztu1cPy/FmePGzuRTMzDeXR8J/yqx/6yhbCrfia03/QFW3T
+            7V8UCna2M0ICHXmFBcko+ZyagXDtw42o7fo6dGt4cDGjxfERJB0U4kVH5F0BXJml
+            3502b2ai5q8h0E8TfbYbxgk+7WcmZOlmbVifFxfA/qTXAXELf4+/ia8Lvw3FB81D
+            /Q1ndI6+FB0UxCxqjprljPXjPURomc52QFAmCaTp4+hqS09QFTVmZSB9LWdHjkAI
+            -----END RSA PRIVATE KEY-----
+          ignore-local-ssh-settings: true
+          cloneOnStart: true
+          searchPaths: './,./{application}'
+
