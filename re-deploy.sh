@@ -3,6 +3,8 @@
 sudo mkdir /data
 sudo chown $USER:root /data
 
+mode=$1
+
 ########### 创建网络
 docker network create micro-services
 
@@ -91,9 +93,23 @@ done
 echo "如果已经把镜像构建放入Docker容器中，则可以使用此脚本在容器中启动一个实例，实例的名称跟服务名称相同。"
 for service in ${services[@]}; do
     echo "启动${service}服务"
-    docker run --network micro-services --name ${service} --network-alias ${service} \
-        -P \
-        -d ${service}:${version}
+    if [[ $mode == 'dev' ]]; then
+        docker run --network micro-services --name ${service} --network-alias ${service} \
+            -P \
+            -d ${service}:${version} \
+            java \
+            -Dspring.profiles.active=dev,native \
+            -Dspring.cloud.config.uri=http://config-center:20002 \
+            -Deureka.client.serviceUrl.defaultZone=http://registry-center:8761/eureka \
+            -Dspring.datasource.url="jdbc:mysql://mysql-server:3306/cloud?useSSL=false&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true" \
+            -jar ${service}.jar
+    else
+        docker run --network micro-services --name ${service} --network-alias ${service} \
+            -P \
+            -d ${service}:${version} \
+            java \
+            -jar ${service}.jar
+    fi
     sleep 10
 done
 echo "所有服务的服务实例启动成功"

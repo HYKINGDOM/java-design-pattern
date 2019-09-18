@@ -12,13 +12,13 @@ module.exports = {
     assetsPublicPath: '/',
     proxyTable: {
       '/api': {
-        target: 'http://127.0.0.1:20001'
+        target: 'http://api-gateway:20001'
       },
       '/oauth2': {
-        target: 'http://127.0.0.1:20001'
+        target: 'http://api-gateway:20001'
       },
       '/login/oauth2':{
-        target: 'http://127.0.0.1:20001'
+        target: 'http://api-gateway:20001'
       }
     },
 
