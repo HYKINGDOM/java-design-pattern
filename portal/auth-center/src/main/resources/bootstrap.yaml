@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: auth-center
+  cloud:
+    config:
+      uri: http://config-center:20002
+      fail-fast: true

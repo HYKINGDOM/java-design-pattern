@@ -4,9 +4,31 @@
 
 在构建后端微服务程序的时候，需要连接MySQL和Redis，而因为MySQL和Redis都映射了本地端口，所以只需要手动在/etc/hosts中增加：
 
-```
-127.0.0.1  redis
-127.0.0.1  mysql-server
+```shell
+127.0.0.1             registry-center
+127.0.0.1             config-center
+127.0.0.1             user-center
+127.0.0.1             verify-code
+127.0.0.1             storage
+127.0.0.1             we-chat
+127.0.0.1             content
+127.0.0.1             daily-sign-in
+127.0.0.1             monitor
+127.0.0.1             oauth-server
+127.0.0.1             api-gateway
+
+# 下面两个用于代替api-gateway和oauth-server
+127.0.0.1             gateway
+127.0.0.1             auth-center
+
+127.0.0.1       mysql-server
+127.0.0.1       redis
+
+# 在dev环境下，所有访问都通过非标准端口访问，但是正式环境中则通过标准端口访问，因此测试正式环境还需要：
+# 反向代理到auth-center
+127.0.0.1        auth.weidoc.cn
+# 反向代理到gateway
+127.0.0.1        api.weidoc.cn
 ```
 
 同时要提前准备好Java、Maven、Node.js的相关环境！

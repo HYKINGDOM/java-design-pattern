@@ -26,6 +26,8 @@
         <module>content</module>
         <module>daily-sign-in</module>
         <module>event-domain</module>
+        <module>auth-center</module>
+        <module>gateway</module>
     </modules>
     <packaging>pom</packaging>
 
