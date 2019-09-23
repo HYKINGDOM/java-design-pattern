@@ -33,20 +33,23 @@
 
 同时要提前准备好Java、Maven、Node.js的相关环境！
 
+## 安装Node.js
+
 ```shell
 wget https://nodejs.org/dist/v10.16.3/node-v10.16.3-linux-x64.tar.xz
 tar -Jxf node-v10.16.3-linux-x64.tar.xz
 cd node-v10.16.3-linux-x64
 sudo bash
 echo export NODE_HOME=`pwd` > /etc/profile.d/node.sh
-echo PATH=`pwd`/bin:$PATH >> /etc/profile.d/node.sh
+echo PATH=`pwd`/bin:\$PATH >> /etc/profile.d/node.sh
 exit
 source /etc/profile.d/node.sh
 npm  config  set metrics-registry "https://registry.npm.taobao.org/"
 npm  config  set  registry  "https://registry.npm.taobao.org/"
+cd ~
 ```
 
-
+## 安装JDK
 
 ```shell
 # 检查是否有JDK的文件，如果没有则自动下载一个
@@ -70,9 +73,10 @@ echo "PATH=\$JAVA_HOME/bin:\$PATH" >> /etc/profile.d/jdk.sh
 exit
 
 source /etc/profile.d/jdk.sh
+cd ~
 ```
 
-
+## 安装Maven
 
 ```shell
 sudo mkdir -p /data/maven_repository
@@ -124,10 +128,22 @@ cp apache-maven-3.6.2/conf/settings.xml ~/.m2/
 
 # 配置Maven的环境变量，把mvn命令的路径加入PATH环境变量中
 sudo bash
-echo "M2_HOME=$SCRIPT_DIR/apache-maven-3.6.2" > /etc/profile.d/maven.sh
+echo "M2_HOME=$PWD/apache-maven-3.6.2" > /etc/profile.d/maven.sh
 echo "PATH=\$M2_HOME/bin:\$PATH" >> /etc/profile.d/maven.sh
 exit
 source /etc/profile.d/maven.sh
+cd ~
+```
+
+
+
+## 安装Docker
+
+```shell
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
+sudo usermod -aG docker $USER
+# 安装好以后，一定要重新登录
 ```
 
 
@@ -167,7 +183,9 @@ docker run --restart always  \
 
 ```shell
 # 数据存储目录
-mkdir -p /data/docker/redis
+sudo rm -rf /data/docker/redis
+sudo mkdir -p /data/docker/redis
+sudo chown $USER /data/docker/redis
 
 # 生成配置文件
 echo -e "
@@ -195,8 +213,11 @@ docker run --restart always  \
 
 ```shell
 # 创建数据存储目录
-mkdir -p /data/docker/mysql/conf.d
-mkdir -p /data/docker/mysql/data
+sudo rm -rf /data/docker/mysql/conf.d
+sudo mkdir -p /data/docker/mysql/conf.d
+sudo rm -rf /data/docker/mysql/data
+sudo mkdir -p /data/docker/mysql/data
+sudo chown -R $USER /data/docker/mysql
 
 # 生成配置文件
 echo -e "
@@ -231,6 +252,9 @@ docker run \
 
 ```shell
 # 导入测试数据，需要MySQL客户端
+sudo apt install mysql-client-5.7
+# 如果已经安装MySQL客户端，不需要执行上一个命令，直接把代码仓库克隆后，得到cloud.sql文件，然后导入！
+# 测试账号13924120301，测试密码1234
 mysql -h127.0.0.1 -uroot -p1234 < cloud.sql
 ```
 
