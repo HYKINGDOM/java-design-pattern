@@ -1,0 +1,7 @@
+spring:
+  application:
+    name: workflow
+  cloud:
+    config:
+      uri: http://config-center:20002
+      fail-fast: true

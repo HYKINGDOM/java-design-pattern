@@ -28,6 +28,7 @@
         <module>event-domain</module>
         <module>auth-center</module>
         <module>gateway</module>
+        <module>workflow</module>
     </modules>
     <packaging>pom</packaging>
 

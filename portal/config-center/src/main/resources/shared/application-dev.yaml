@@ -45,3 +45,9 @@ logging:
               BasicBinder: TRACE
     com:
       netflix: INFO
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health,info,loggers
+        #include: "*"
