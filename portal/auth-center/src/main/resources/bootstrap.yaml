@@ -1,6 +1,6 @@
 spring:
   application:
-    name: api-gateway
+    name: auth-center
   cloud:
     config:
       uri: http://config-center:20002

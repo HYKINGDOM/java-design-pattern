@@ -6,7 +6,7 @@ eureka:
     fetchRegistry: true
     serviceUrl:
       # 分区中有多少个主机
-      defaultZone: http://registry-center:8761/eureka
+      defaultZone: http://127.0.0.1:8761/eureka
   instance:
     prefer-ip-address: true
 
@@ -31,6 +31,7 @@ fk:
       app-id: wx375cd9c53c364fc4
       app-secret: ad91eb3762d1336c39a417173bc47aba
       token: fasdgfgerewewrgdsfsf
+
 logging:
   level:
     root: ERROR

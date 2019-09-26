@@ -1,7 +1,8 @@
 spring:
   application:
-    name: api-gateway
+    name: gateway
   cloud:
     config:
       uri: http://config-center:20002
       fail-fast: true
+

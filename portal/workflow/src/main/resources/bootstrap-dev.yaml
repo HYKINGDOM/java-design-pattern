@@ -1,7 +1,7 @@
 spring:
   application:
-    name: api-gateway
+    name: workflow
   cloud:
     config:
-      uri: http://config-center:20002
+      uri: http://127.0.0.1:20002
       fail-fast: true
