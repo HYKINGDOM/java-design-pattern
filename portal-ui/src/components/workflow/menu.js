@@ -5,6 +5,18 @@ export default [
         key: "Workflow",
         children: [
             {
+                title: "流程管理",
+                icon: "icon-inbox",
+                key: "ProcessManager",
+                children: [
+                    {
+                        title: "流程定义",
+                        icon: "icon-inbox",
+                        key: "/workflow/process/definition"
+                    }
+                ]
+            },
+            {
                 title: "收件箱",
                 icon: "icon-inbox",
                 key: "/workflow/task"

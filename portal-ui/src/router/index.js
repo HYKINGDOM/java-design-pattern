@@ -4,6 +4,7 @@ import Layout from '@/components/Layout'
 import SystemRouterConfig from "../components/system/router"
 import UserRouterConfig from "../components/user/router"
 import AdminRouterConfig from "../components/admin/router"
+import WorkflowRouterConfig from "../components/workflow/router"
 
 Vue.use(Router)
 
@@ -44,6 +45,7 @@ let router = new Router({
         ...AdminRouterConfig,
         ...UserRouterConfig,
         ...SystemRouterConfig,
+        ...WorkflowRouterConfig,
         // 嵌套的路由中，也需要没有找到页面的路由
         error,
         {
